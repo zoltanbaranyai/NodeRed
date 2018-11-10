@@ -1,0 +1,1444 @@
+[
+    {
+        "id": "a5f2991a.dbd368",
+        "type": "mqtt in",
+        "z": "4f455b75.25e2a4",
+        "name": "",
+        "topic": "/Sonoff1/Uptime/",
+        "qos": "0",
+        "broker": "14cde41c.05a03c",
+        "x": 116.66665649414062,
+        "y": 111.66666412353516,
+        "wires": [
+            [
+                "37c50a6c.d6df66"
+            ]
+        ]
+    },
+    {
+        "id": "95e1e297.55e46",
+        "type": "ui_text",
+        "z": "4f455b75.25e2a4",
+        "group": "1ebe3cff.b5c323",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "Uptime",
+        "label": "Uptime",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 581.6666946411133,
+        "y": 112.66669464111328,
+        "wires": []
+    },
+    {
+        "id": "4960be95.46669",
+        "type": "mqtt in",
+        "z": "4f455b75.25e2a4",
+        "name": "",
+        "topic": "/Sonoff1/Wifi/",
+        "qos": "0",
+        "broker": "14cde41c.05a03c",
+        "x": 103.66665649414062,
+        "y": 252.66669464111328,
+        "wires": [
+            [
+                "f1451076.5b5c7",
+                "ab7b117a.e5d98"
+            ]
+        ]
+    },
+    {
+        "id": "f1451076.5b5c7",
+        "type": "ui_gauge",
+        "z": "4f455b75.25e2a4",
+        "name": "Wifi gauge",
+        "group": "1ebe3cff.b5c323",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "",
+        "label": "",
+        "format": "{{value}}",
+        "min": "-100",
+        "max": "-50",
+        "colors": [
+            "#ff0000",
+            "#e6e600",
+            "#00b500"
+        ],
+        "x": 404.6666564941406,
+        "y": 253.66669464111328,
+        "wires": []
+    },
+    {
+        "id": "e0f81a4b.974d98",
+        "type": "comment",
+        "z": "4f455b75.25e2a4",
+        "name": "ESP Signal monitor",
+        "info": "",
+        "x": 127.66665649414062,
+        "y": 55.666664123535156,
+        "wires": []
+    },
+    {
+        "id": "ab7b117a.e5d98",
+        "type": "function",
+        "z": "4f455b75.25e2a4",
+        "name": "From last update",
+        "func": "var temp = global.get(\"Sonoff1_wifi\");\nvar current = new Date();\nif (temp!== undefined && temp!==null) {\n    msg.payload = current.getTime() - temp;\n    global.set(\"Sonoff1_wifi\",current.getTime());\n} else {\n    msg.payload = \"\";\n    global.set(\"Sonoff1_wifi\",current.getTime());\n}\n\n// Update the status with current timestamp\nvar now = new Date();\nvar yyyy = now.getFullYear();\nvar mm = now.getMonth() < 9 ? \"0\" + (now.getMonth() + 1) : (now.getMonth() + 1); // getMonth() is zero-based\nvar dd  = now.getDate() < 10 ? \"0\" + now.getDate() : now.getDate();\nvar hh = now.getHours() < 10 ? \"0\" + now.getHours() : now.getHours();\nvar mmm  = now.getMinutes() < 10 ? \"0\" + now.getMinutes() : now.getMinutes();\nvar ss  = now.getSeconds() < 10 ? \"0\" + now.getSeconds() : now.getSeconds();\nnode.status({fill:\"blue\",shape:\"ring\",text:\"Last update: \"+dd + \".\" + mm + \".\" + yyyy + \" \" + hh + \":\" + mmm + \":\" + ss});\n\nmsg.formattedtime = dd + \".\" + mm + \".\" + yyyy + \" \" + hh + \":\" + mmm + \":\" + ss;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 423.66666412353516,
+        "y": 299.6666946411133,
+        "wires": [
+            [
+                "f2be25f7.b41ac8"
+            ]
+        ]
+    },
+    {
+        "id": "f2be25f7.b41ac8",
+        "type": "ui_text",
+        "z": "4f455b75.25e2a4",
+        "group": "1ebe3cff.b5c323",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Milis from last update",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 701.6666564941406,
+        "y": 306.6666946411133,
+        "wires": []
+    },
+    {
+        "id": "9bfbaf7f.759ff",
+        "type": "comment",
+        "z": "4f455b75.25e2a4",
+        "name": "Monitor sonoff restart",
+        "info": "",
+        "x": 365.3333206176758,
+        "y": 56.33325958251953,
+        "wires": []
+    },
+    {
+        "id": "37c50a6c.d6df66",
+        "type": "function",
+        "z": "4f455b75.25e2a4",
+        "name": "Save last uptime",
+        "func": "var devicename = \"Sonoff1\";\nvar varname = devicename + \"_uptime\";\n\nif (global.get(varname)!==undefined) {\n    if (parseInt(msg.payload)<global.get(varname)) {\n        msg.warning_text= devicename + \" restarted: \" + global.get(varname) + \" -> \" + msg.payload;\n        msg.device = devicename;\n        msg.warning=true;\n    } else {\n        msg.warning=false;\n    }\n}\n\nglobal.set(varname,parseInt(msg.payload));\n\nif (msg.warning) {\n    node.status({fill:\"red\",shape:\"dot\",text:msg.warning_text});\n} else {\n    node.status({fill:\"green\",shape:\"dot\",text:\"Current uptime: \"+global.get(varname)});\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 357.3333206176758,
+        "y": 112.66663360595703,
+        "wires": [
+            [
+                "95e1e297.55e46",
+                "16efb106.01137f"
+            ]
+        ]
+    },
+    {
+        "id": "16efb106.01137f",
+        "type": "switch",
+        "z": "4f455b75.25e2a4",
+        "name": "Restart?",
+        "property": "warning",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            }
+        ],
+        "checkall": "true",
+        "outputs": 1,
+        "x": 576.3333206176758,
+        "y": 169.66663360595703,
+        "wires": [
+            [
+                "b5f58daa.bc695"
+            ]
+        ]
+    },
+    {
+        "id": "b5f58daa.bc695",
+        "type": "change",
+        "z": "4f455b75.25e2a4",
+        "name": "Toast message",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "device",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "warning_text",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 769.3333206176758,
+        "y": 169.66663360595703,
+        "wires": [
+            [
+                "3856d5ab.8d8fda"
+            ]
+        ]
+    },
+    {
+        "id": "3856d5ab.8d8fda",
+        "type": "link out",
+        "z": "4f455b75.25e2a4",
+        "name": "",
+        "links": [
+            "3e084f74.ca14"
+        ],
+        "x": 921.1904487609863,
+        "y": 169.23805236816406,
+        "wires": []
+    },
+    {
+        "id": "5e886445.dd0dfc",
+        "type": "ui_text",
+        "z": "4f455b75.25e2a4",
+        "group": "1ebe3cff.b5c323",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "name": "Last Update",
+        "label": "",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 688.3333206176758,
+        "y": 355.66663360595703,
+        "wires": []
+    },
+    {
+        "id": "ea4fc288.d8d8a",
+        "type": "inject",
+        "z": "4f455b75.25e2a4",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "1",
+        "crontab": "",
+        "once": false,
+        "x": 216.33332061767578,
+        "y": 357.66663360595703,
+        "wires": [
+            [
+                "7c1b51de.d9f1"
+            ]
+        ]
+    },
+    {
+        "id": "7c1b51de.d9f1",
+        "type": "function",
+        "z": "4f455b75.25e2a4",
+        "name": "From last update",
+        "func": "var temp = global.get(\"Sonoff1_wifi\");\nvar current = new Date();\nmsg.payload = \"No data\";\n\nif (temp!==undefined) {\n    current = current - temp;\n    current = Math.floor(current/1000);\n    var minute = Math.floor(current/60);\n    var hour = Math.floor(minute/60);\n    var day = Math.floor(hour/24);\n    if (current>24*60*60) {\n        msg.payload = \"Last update \" + day + \" days, \" + hour%24 + \" hours, \" + minute%60 + \" minutes, \" + current%60 + \" seconds ago\";\n    } else if (current>60*60) {\n        msg.payload = \"Last update \" + hour%24 + \" hours, \" + minute%60 + \" minutes, \" + current%60 + \" seconds ago\";\n    } else if (current>60) {\n        msg.payload = \"Last update \" + minute%60 + \" minutes, \" + current%60 + \" seconds ago\";\n    } else {\n        msg.payload = \"Last update \" + current%60 + \" seconds ago\";\n    }\n}\n\nnode.status({fill:\"blue\",shape:\"ring\",text:msg.payload});\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 428.3333206176758,
+        "y": 357.66663360595703,
+        "wires": [
+            [
+                "5e886445.dd0dfc"
+            ]
+        ]
+    },
+    {
+        "id": "a63a1fa7.235b7",
+        "type": "mqtt in",
+        "z": "4f455b75.25e2a4",
+        "name": "",
+        "topic": "/RGB/Uptime/",
+        "qos": "0",
+        "broker": "14cde41c.05a03c",
+        "x": 97.66665649414062,
+        "y": 479.6666564941406,
+        "wires": [
+            [
+                "f1e76193.c2e56"
+            ]
+        ]
+    },
+    {
+        "id": "fb6ce7a1.9f5508",
+        "type": "ui_text",
+        "z": "4f455b75.25e2a4",
+        "group": "28286248.b5db0e",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "Uptime",
+        "label": "Uptime",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 572.6666946411133,
+        "y": 480.66668701171875,
+        "wires": []
+    },
+    {
+        "id": "f46440c8.628c4",
+        "type": "mqtt in",
+        "z": "4f455b75.25e2a4",
+        "name": "",
+        "topic": "/RGB/Wifi/",
+        "qos": "0",
+        "broker": "14cde41c.05a03c",
+        "x": 84.66665649414062,
+        "y": 620.6666870117188,
+        "wires": [
+            [
+                "ff72f81a.615158",
+                "a0072fda.bb68f"
+            ]
+        ]
+    },
+    {
+        "id": "ff72f81a.615158",
+        "type": "ui_gauge",
+        "z": "4f455b75.25e2a4",
+        "name": "Wifi gauge",
+        "group": "28286248.b5db0e",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "",
+        "label": "",
+        "format": "{{value}}",
+        "min": "-100",
+        "max": "-50",
+        "colors": [
+            "#ff0000",
+            "#e6e600",
+            "#00b500"
+        ],
+        "x": 395.6666564941406,
+        "y": 621.6666870117188,
+        "wires": []
+    },
+    {
+        "id": "6dc63f36.d81fa",
+        "type": "comment",
+        "z": "4f455b75.25e2a4",
+        "name": "H801 Signal monitor",
+        "info": "",
+        "x": 118.66665649414062,
+        "y": 423.6666564941406,
+        "wires": []
+    },
+    {
+        "id": "a0072fda.bb68f",
+        "type": "function",
+        "z": "4f455b75.25e2a4",
+        "name": "From last update",
+        "func": "var temp = global.get(\"RGB_wifi\");\nvar current = new Date();\nif (temp!== undefined && temp!==null) {\n    msg.payload = current.getTime() - temp;\n    global.set(\"RGB_wifi\",current.getTime());\n} else {\n    msg.payload = \"\";\n    global.set(\"RGB_wifi\",current.getTime());\n}\n\n// Update the status with current timestamp\nvar now = new Date();\nvar yyyy = now.getFullYear();\nvar mm = now.getMonth() < 9 ? \"0\" + (now.getMonth() + 1) : (now.getMonth() + 1); // getMonth() is zero-based\nvar dd  = now.getDate() < 10 ? \"0\" + now.getDate() : now.getDate();\nvar hh = now.getHours() < 10 ? \"0\" + now.getHours() : now.getHours();\nvar mmm  = now.getMinutes() < 10 ? \"0\" + now.getMinutes() : now.getMinutes();\nvar ss  = now.getSeconds() < 10 ? \"0\" + now.getSeconds() : now.getSeconds();\nnode.status({fill:\"blue\",shape:\"ring\",text:\"Last update: \"+dd + \".\" + mm + \".\" + yyyy + \" \" + hh + \":\" + mmm + \":\" + ss});\n\nmsg.formattedtime = dd + \".\" + mm + \".\" + yyyy + \" \" + hh + \":\" + mmm + \":\" + ss;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 412.6666564941406,
+        "y": 674.6666870117188,
+        "wires": [
+            [
+                "37fc576d.73b608"
+            ]
+        ]
+    },
+    {
+        "id": "37fc576d.73b608",
+        "type": "ui_text",
+        "z": "4f455b75.25e2a4",
+        "group": "28286248.b5db0e",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Milis from last update",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 692.6666564941406,
+        "y": 674.6666870117188,
+        "wires": []
+    },
+    {
+        "id": "f8249c3d.3b123",
+        "type": "comment",
+        "z": "4f455b75.25e2a4",
+        "name": "Monitor sonoff restart",
+        "info": "",
+        "x": 356.3333206176758,
+        "y": 424.333251953125,
+        "wires": []
+    },
+    {
+        "id": "f1e76193.c2e56",
+        "type": "function",
+        "z": "4f455b75.25e2a4",
+        "name": "Save last uptime",
+        "func": "var devicename = \"RGB\";\nvar varname = devicename + \"_uptime\";\n\nif (global.get(varname)!==undefined) {\n    if (parseInt(msg.payload)<global.get(varname)) {\n        msg.warning_text= devicename + \" restarted: \" + global.get(varname) + \" -> \" + msg.payload;\n        msg.device = devicename;\n        msg.warning=true;\n    } else {\n        msg.warning=false;\n    }\n}\n\nglobal.set(varname,parseInt(msg.payload));\n\nif (msg.warning) {\n    node.status({fill:\"red\",shape:\"dot\",text:msg.warning_text});\n} else {\n    node.status({fill:\"green\",shape:\"dot\",text:\"Current uptime: \"+global.get(varname)});\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 348.3333206176758,
+        "y": 480.6666259765625,
+        "wires": [
+            [
+                "fb6ce7a1.9f5508",
+                "80535f2d.9475f"
+            ]
+        ]
+    },
+    {
+        "id": "80535f2d.9475f",
+        "type": "switch",
+        "z": "4f455b75.25e2a4",
+        "name": "Restart?",
+        "property": "warning",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            }
+        ],
+        "checkall": "true",
+        "outputs": 1,
+        "x": 567.3333206176758,
+        "y": 537.6666259765625,
+        "wires": [
+            [
+                "d380519.81e82b"
+            ]
+        ]
+    },
+    {
+        "id": "d380519.81e82b",
+        "type": "change",
+        "z": "4f455b75.25e2a4",
+        "name": "Toast message",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "device",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "warning_text",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 760.3333206176758,
+        "y": 537.6666259765625,
+        "wires": [
+            [
+                "b269605b.102e"
+            ]
+        ]
+    },
+    {
+        "id": "b269605b.102e",
+        "type": "link out",
+        "z": "4f455b75.25e2a4",
+        "name": "",
+        "links": [
+            "3e084f74.ca14"
+        ],
+        "x": 912.1904487609863,
+        "y": 537.2380447387695,
+        "wires": []
+    },
+    {
+        "id": "7a01da25.fe3964",
+        "type": "ui_text",
+        "z": "4f455b75.25e2a4",
+        "group": "28286248.b5db0e",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "name": "Last Update",
+        "label": "",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 673.6666641235352,
+        "y": 731.08349609375,
+        "wires": []
+    },
+    {
+        "id": "8ab8e67d.da7848",
+        "type": "inject",
+        "z": "4f455b75.25e2a4",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "1",
+        "crontab": "",
+        "once": false,
+        "x": 201.66666412353516,
+        "y": 733.08349609375,
+        "wires": [
+            [
+                "80639922.a63e38"
+            ]
+        ]
+    },
+    {
+        "id": "80639922.a63e38",
+        "type": "function",
+        "z": "4f455b75.25e2a4",
+        "name": "From last update",
+        "func": "var temp = global.get(\"RGB_wifi\");\nvar current = new Date();\nmsg.payload = \"No data\";\n\nif (temp!==undefined) {\n    current = current - temp;\n    current = Math.floor(current/1000);\n    var minute = Math.floor(current/60);\n    var hour = Math.floor(minute/60);\n    var day = Math.floor(hour/24);\n    if (current>24*60*60) {\n        msg.payload = \"Last update \" + day + \" days, \" + hour%24 + \" hours, \" + minute%60 + \" minutes, \" + current%60 + \" seconds ago\";\n    } else if (current>60*60) {\n        msg.payload = \"Last update \" + hour%24 + \" hours, \" + minute%60 + \" minutes, \" + current%60 + \" seconds ago\";\n    } else if (current>60) {\n        msg.payload = \"Last update \" + minute%60 + \" minutes, \" + current%60 + \" seconds ago\";\n    } else {\n        msg.payload = \"Last update \" + current%60 + \" seconds ago\";\n    }\n}\n\nnode.status({fill:\"blue\",shape:\"ring\",text:msg.payload});\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 413.66666412353516,
+        "y": 733.08349609375,
+        "wires": [
+            [
+                "7a01da25.fe3964"
+            ]
+        ]
+    },
+    {
+        "id": "b9b5867c.b30df8",
+        "type": "inject",
+        "z": "4f455b75.25e2a4",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "600",
+        "crontab": "",
+        "once": false,
+        "x": 120.66665649414062,
+        "y": 932.3333740234375,
+        "wires": [
+            [
+                "45a5f5c0.c6eb6c",
+                "bb3c8a4a.aa73e8",
+                "e646f82a.d8b268",
+                "69341ba2.52df64",
+                "39deb4e3.0d030c",
+                "33eb672c.41a828",
+                "a02e72d5.5879e"
+            ]
+        ]
+    },
+    {
+        "id": "45a5f5c0.c6eb6c",
+        "type": "http request",
+        "z": "4f455b75.25e2a4",
+        "name": "Sonoff 1 poll",
+        "method": "GET",
+        "ret": "txt",
+        "url": "http://192.168.1.117/",
+        "tls": "",
+        "x": 338.66666412353516,
+        "y": 931.3333339691162,
+        "wires": [
+            [
+                "81b971a7.c9ed6"
+            ]
+        ]
+    },
+    {
+        "id": "81b971a7.c9ed6",
+        "type": "function",
+        "z": "4f455b75.25e2a4",
+        "name": "Result calculator",
+        "func": "var stat = global.get(\"Sonoff1_webstat\");\n\nif (stat===undefined) {\n    stat = {count:0, OK:0, ECONNRESET:0, ENOTFOUND:0, ETIMEDOUT:0, other:0};\n}\nswitch (msg.statusCode) {\n    case 200:\n        stat.count++;\n        stat.OK++;\n        break;\n    case \"ECONNRESET\":\n        stat.count++;\n        stat.ECONNRESET++;\n        break;\n    case \"ENOTFOUND\":\n        stat.count++;\n        stat.ENOTFOUND++;\n        break;\n    case \"ETIMEDOUT\":\n        stat.count++;\n        stat.ETIMEDOUT++;\n        break;\n    default:    \n        stat.count++;\n        stat.other++;\n}\n\nglobal.set(\"Sonoff1_webstat\",stat);\n\nreturn [\n    {topic:\"OK\", payload:stat.OK},\n    {topic:\"Connection reset\", payload:stat.ECONNRESET},\n    {topic:\"Timed out\", payload:stat.ETIMEDOUT},\n    {topic:\"Not found\", payload:stat.ENOTFOUND},\n    {topic:\"Other error\", payload:stat.other}\n    ];\n\n",
+        "outputs": "5",
+        "noerr": 0,
+        "x": 578.6665420532227,
+        "y": 940.3333339691162,
+        "wires": [
+            [
+                "ba0552f9.c621d",
+                "9033b13f.7af7e"
+            ],
+            [
+                "ba0552f9.c621d",
+                "9033b13f.7af7e"
+            ],
+            [
+                "ba0552f9.c621d",
+                "9033b13f.7af7e"
+            ],
+            [
+                "ba0552f9.c621d",
+                "9033b13f.7af7e"
+            ],
+            [
+                "ba0552f9.c621d",
+                "9033b13f.7af7e"
+            ]
+        ]
+    },
+    {
+        "id": "ba0552f9.c621d",
+        "type": "ui_chart",
+        "z": "4f455b75.25e2a4",
+        "name": "Sonoff 1 chart",
+        "group": "1ebe3cff.b5c323",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "Web Config Response",
+        "chartType": "pie",
+        "legend": "true",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "x": 861.6666564941406,
+        "y": 929.3333740234375,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "dac932a7.69962",
+        "type": "comment",
+        "z": "4f455b75.25e2a4",
+        "name": "Web response statistics",
+        "info": "",
+        "x": 134.16663360595703,
+        "y": 822.3333339691162,
+        "wires": []
+    },
+    {
+        "id": "a16c04fa.a02198",
+        "type": "function",
+        "z": "4f455b75.25e2a4",
+        "name": "Reset chart",
+        "func": "//stat = {count:0, OK:0, ECONNRESET:0, ENOTFOUND:0, ETIMEDOUT:0, other:0};\nglobal.set(\"Sonoff1_webstat\",undefined);\nglobal.set(\"H801_webstat\",undefined);\nglobal.set(\"Sonoff2_webstat\",undefined);\nglobal.set(\"Sonoff3_webstat\",undefined);\nglobal.set(\"Sonoff4_webstat\",undefined);\nglobal.set(\"Sonoff5_webstat\",undefined);\nglobal.set(\"Sonoff6_webstat\",undefined);\nmsg.payload = [];\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 596.166633605957,
+        "y": 879.3333339691162,
+        "wires": [
+            [
+                "ba0552f9.c621d",
+                "9033b13f.7af7e",
+                "dde2ae87.ad47b",
+                "b8d05e90.a2b3",
+                "2aa4e60b.f8f41a",
+                "a0c9ab12.1e3758",
+                "7e42976f.aeadd8",
+                "4ad51221.d0c52c",
+                "42866f99.e5c15",
+                "12e908f4.449847",
+                "28bda36e.afa59c",
+                "4c839f1c.7714f",
+                "c8ceac4c.ff80f",
+                "717b123.23209ec"
+            ]
+        ]
+    },
+    {
+        "id": "92a144e3.ad4d68",
+        "type": "inject",
+        "z": "4f455b75.25e2a4",
+        "name": "Full reset",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 112.16663360595703,
+        "y": 880.3333339691162,
+        "wires": [
+            [
+                "a16c04fa.a02198"
+            ]
+        ]
+    },
+    {
+        "id": "9033b13f.7af7e",
+        "type": "ui_chart",
+        "z": "4f455b75.25e2a4",
+        "name": "Sonoff 1 chart",
+        "group": "1ebe3cff.b5c323",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "x": 861.166633605957,
+        "y": 970.3333339691162,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "bb3c8a4a.aa73e8",
+        "type": "http request",
+        "z": "4f455b75.25e2a4",
+        "name": "H801 poll",
+        "method": "GET",
+        "ret": "txt",
+        "url": "http://192.168.1.126/",
+        "tls": "",
+        "x": 337.16666412353516,
+        "y": 1036.3333339691162,
+        "wires": [
+            [
+                "e02a4d6b.f9b1c"
+            ]
+        ]
+    },
+    {
+        "id": "e02a4d6b.f9b1c",
+        "type": "function",
+        "z": "4f455b75.25e2a4",
+        "name": "Result calculator",
+        "func": "var stat = global.get(\"H801_webstat\");\n\nif (stat===undefined) {\n    stat = {count:0, OK:0, ECONNRESET:0, ENOTFOUND:0, ETIMEDOUT:0, other:0};\n}\nswitch (msg.statusCode) {\n    case 200:\n        stat.count++;\n        stat.OK++;\n        break;\n    case \"ECONNRESET\":\n        stat.count++;\n        stat.ECONNRESET++;\n        break;\n    case \"ENOTFOUND\":\n        stat.count++;\n        stat.ENOTFOUND++;\n        break;\n    case \"ETIMEDOUT\":\n        stat.count++;\n        stat.ETIMEDOUT++;\n        break;\n    default:    \n        stat.count++;\n        stat.other++;\n}\n\nglobal.set(\"H801_webstat\",stat);\n\nreturn [\n    {topic:\"OK\", payload:stat.OK},\n    {topic:\"Connection reset\", payload:stat.ECONNRESET},\n    {topic:\"Timed out\", payload:stat.ETIMEDOUT},\n    {topic:\"Not found\", payload:stat.ENOTFOUND},\n    {topic:\"Other error\", payload:stat.other}\n    ];\n",
+        "outputs": "5",
+        "noerr": 0,
+        "x": 583.1666412353516,
+        "y": 1033.333293914795,
+        "wires": [
+            [
+                "dde2ae87.ad47b",
+                "b8d05e90.a2b3"
+            ],
+            [
+                "dde2ae87.ad47b",
+                "b8d05e90.a2b3"
+            ],
+            [
+                "dde2ae87.ad47b",
+                "b8d05e90.a2b3"
+            ],
+            [
+                "dde2ae87.ad47b",
+                "b8d05e90.a2b3"
+            ],
+            [
+                "dde2ae87.ad47b",
+                "b8d05e90.a2b3"
+            ]
+        ]
+    },
+    {
+        "id": "dde2ae87.ad47b",
+        "type": "ui_chart",
+        "z": "4f455b75.25e2a4",
+        "name": "H801 chart",
+        "group": "28286248.b5db0e",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "Web Config Response",
+        "chartType": "pie",
+        "legend": "true",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "x": 860.1666641235352,
+        "y": 1033.3333339691162,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "b8d05e90.a2b3",
+        "type": "ui_chart",
+        "z": "4f455b75.25e2a4",
+        "name": "H801 chart",
+        "group": "28286248.b5db0e",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "x": 859.6666412353516,
+        "y": 1074.333293914795,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "e646f82a.d8b268",
+        "type": "http request",
+        "z": "4f455b75.25e2a4",
+        "name": "Sonoff2 poll",
+        "method": "GET",
+        "ret": "txt",
+        "url": "http://192.168.1.128/",
+        "tls": "",
+        "x": 340.16666412353516,
+        "y": 1126.3333339691162,
+        "wires": [
+            [
+                "1176c5cc.3fb1fa"
+            ]
+        ]
+    },
+    {
+        "id": "1176c5cc.3fb1fa",
+        "type": "function",
+        "z": "4f455b75.25e2a4",
+        "name": "Result calculator",
+        "func": "var stat = global.get(\"Sonoff2_webstat\");\n\nif (stat===undefined) {\n    stat = {count:0, OK:0, ECONNRESET:0, ENOTFOUND:0, ETIMEDOUT:0, other:0};\n}\nswitch (msg.statusCode) {\n    case 200:\n        stat.count++;\n        stat.OK++;\n        break;\n    case \"ECONNRESET\":\n        stat.count++;\n        stat.ECONNRESET++;\n        break;\n    case \"ENOTFOUND\":\n        stat.count++;\n        stat.ENOTFOUND++;\n        break;\n    case \"ETIMEDOUT\":\n        stat.count++;\n        stat.ETIMEDOUT++;\n        break;\n    default:    \n        stat.count++;\n        stat.other++;\n}\n\nglobal.set(\"Sonoff2_webstat\",stat);\n\nreturn [\n    {topic:\"OK\", payload:stat.OK},\n    {topic:\"Connection reset\", payload:stat.ECONNRESET},\n    {topic:\"Timed out\", payload:stat.ETIMEDOUT},\n    {topic:\"Not found\", payload:stat.ENOTFOUND},\n    {topic:\"Other error\", payload:stat.other}\n    ];\n",
+        "outputs": "5",
+        "noerr": 0,
+        "x": 576.166633605957,
+        "y": 1124.3333339691162,
+        "wires": [
+            [
+                "2aa4e60b.f8f41a",
+                "a0c9ab12.1e3758"
+            ],
+            [
+                "2aa4e60b.f8f41a",
+                "a0c9ab12.1e3758"
+            ],
+            [
+                "2aa4e60b.f8f41a",
+                "a0c9ab12.1e3758"
+            ],
+            [
+                "2aa4e60b.f8f41a",
+                "a0c9ab12.1e3758"
+            ],
+            [
+                "2aa4e60b.f8f41a",
+                "a0c9ab12.1e3758"
+            ]
+        ]
+    },
+    {
+        "id": "2aa4e60b.f8f41a",
+        "type": "ui_chart",
+        "z": "4f455b75.25e2a4",
+        "name": "Sonoff2 chart",
+        "group": "c261ff7a.a6a4d",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "Web Config Response",
+        "chartType": "pie",
+        "legend": "true",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "x": 863.1666564941406,
+        "y": 1124.3333740234375,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "a0c9ab12.1e3758",
+        "type": "ui_chart",
+        "z": "4f455b75.25e2a4",
+        "name": "Sonoff2 chart",
+        "group": "c261ff7a.a6a4d",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "x": 862.666633605957,
+        "y": 1165.3333339691162,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "69341ba2.52df64",
+        "type": "http request",
+        "z": "4f455b75.25e2a4",
+        "name": "Sonoff3 poll",
+        "method": "GET",
+        "ret": "txt",
+        "url": "http://192.168.1.130",
+        "tls": "",
+        "x": 342.16663360595703,
+        "y": 1219.3333339691162,
+        "wires": [
+            [
+                "20639eb9.ad5e22"
+            ]
+        ]
+    },
+    {
+        "id": "20639eb9.ad5e22",
+        "type": "function",
+        "z": "4f455b75.25e2a4",
+        "name": "Result calculator",
+        "func": "var stat = global.get(\"Sonoff3_webstat\");\n\nif (stat===undefined) {\n    stat = {count:0, OK:0, ECONNRESET:0, ENOTFOUND:0, ETIMEDOUT:0, other:0};\n}\nswitch (msg.statusCode) {\n    case 200:\n        stat.count++;\n        stat.OK++;\n        break;\n    case \"ECONNRESET\":\n        stat.count++;\n        stat.ECONNRESET++;\n        break;\n    case \"ENOTFOUND\":\n        stat.count++;\n        stat.ENOTFOUND++;\n        break;\n    case \"ETIMEDOUT\":\n        stat.count++;\n        stat.ETIMEDOUT++;\n        break;\n    default:    \n        stat.count++;\n        stat.other++;\n}\n\nglobal.set(\"Sonoff3_webstat\",stat);\n\nreturn [\n    {topic:\"OK\", payload:stat.OK},\n    {topic:\"Connection reset\", payload:stat.ECONNRESET},\n    {topic:\"Timed out\", payload:stat.ETIMEDOUT},\n    {topic:\"Not found\", payload:stat.ENOTFOUND},\n    {topic:\"Other error\", payload:stat.other}\n    ];\n",
+        "outputs": "5",
+        "noerr": 0,
+        "x": 578.1666030883789,
+        "y": 1217.3333339691162,
+        "wires": [
+            [
+                "7e42976f.aeadd8",
+                "4ad51221.d0c52c"
+            ],
+            [
+                "7e42976f.aeadd8",
+                "4ad51221.d0c52c"
+            ],
+            [
+                "7e42976f.aeadd8",
+                "4ad51221.d0c52c"
+            ],
+            [
+                "7e42976f.aeadd8",
+                "4ad51221.d0c52c"
+            ],
+            [
+                "7e42976f.aeadd8",
+                "4ad51221.d0c52c"
+            ]
+        ]
+    },
+    {
+        "id": "7e42976f.aeadd8",
+        "type": "ui_chart",
+        "z": "4f455b75.25e2a4",
+        "name": "Sonoff3 chart",
+        "group": "4df39fa3.fc11",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "Web Config Response",
+        "chartType": "pie",
+        "legend": "true",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "x": 865.1666259765625,
+        "y": 1217.3333740234375,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "4ad51221.d0c52c",
+        "type": "ui_chart",
+        "z": "4f455b75.25e2a4",
+        "name": "Sonoff3 chart",
+        "group": "4df39fa3.fc11",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "x": 864.6666030883789,
+        "y": 1258.3333339691162,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "39deb4e3.0d030c",
+        "type": "http request",
+        "z": "4f455b75.25e2a4",
+        "name": "Sonoff4 poll",
+        "method": "GET",
+        "ret": "txt",
+        "url": "http://192.168.1.131",
+        "tls": "",
+        "x": 330.16663360595703,
+        "y": 1308.3333339691162,
+        "wires": [
+            [
+                "b3bba970.42c598"
+            ]
+        ]
+    },
+    {
+        "id": "b3bba970.42c598",
+        "type": "function",
+        "z": "4f455b75.25e2a4",
+        "name": "Result calculator",
+        "func": "var stat = global.get(\"Sonoff4_webstat\");\n\nif (stat===undefined) {\n    stat = {count:0, OK:0, ECONNRESET:0, ENOTFOUND:0, ETIMEDOUT:0, other:0};\n}\nswitch (msg.statusCode) {\n    case 200:\n        stat.count++;\n        stat.OK++;\n        break;\n    case \"ECONNRESET\":\n        stat.count++;\n        stat.ECONNRESET++;\n        break;\n    case \"ENOTFOUND\":\n        stat.count++;\n        stat.ENOTFOUND++;\n        break;\n    case \"ETIMEDOUT\":\n        stat.count++;\n        stat.ETIMEDOUT++;\n        break;\n    default:    \n        stat.count++;\n        stat.other++;\n}\n\nglobal.set(\"Sonoff4_webstat\",stat);\n\nreturn [\n    {topic:\"OK\", payload:stat.OK},\n    {topic:\"Connection reset\", payload:stat.ECONNRESET},\n    {topic:\"Timed out\", payload:stat.ETIMEDOUT},\n    {topic:\"Not found\", payload:stat.ENOTFOUND},\n    {topic:\"Other error\", payload:stat.other}\n    ];\n",
+        "outputs": "5",
+        "noerr": 0,
+        "x": 566.1666030883789,
+        "y": 1306.3333339691162,
+        "wires": [
+            [
+                "42866f99.e5c15",
+                "12e908f4.449847"
+            ],
+            [
+                "42866f99.e5c15",
+                "12e908f4.449847"
+            ],
+            [
+                "42866f99.e5c15",
+                "12e908f4.449847"
+            ],
+            [
+                "42866f99.e5c15",
+                "12e908f4.449847"
+            ],
+            [
+                "42866f99.e5c15",
+                "12e908f4.449847"
+            ]
+        ]
+    },
+    {
+        "id": "42866f99.e5c15",
+        "type": "ui_chart",
+        "z": "4f455b75.25e2a4",
+        "name": "Sonoff4 chart",
+        "group": "7189a9d3.afd5b8",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "Web Config Response",
+        "chartType": "pie",
+        "legend": "true",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "x": 853.1666259765625,
+        "y": 1306.3333740234375,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "12e908f4.449847",
+        "type": "ui_chart",
+        "z": "4f455b75.25e2a4",
+        "name": "Sonoff4 chart",
+        "group": "7189a9d3.afd5b8",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "x": 852.6666030883789,
+        "y": 1347.3333339691162,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "33eb672c.41a828",
+        "type": "http request",
+        "z": "4f455b75.25e2a4",
+        "name": "Sonoff5 poll",
+        "method": "GET",
+        "ret": "txt",
+        "url": "http://192.168.1.132",
+        "tls": "",
+        "x": 322.16663360595703,
+        "y": 1395.3333339691162,
+        "wires": [
+            [
+                "6ae59c5.291c964"
+            ]
+        ]
+    },
+    {
+        "id": "6ae59c5.291c964",
+        "type": "function",
+        "z": "4f455b75.25e2a4",
+        "name": "Result calculator",
+        "func": "var stat = global.get(\"Sonoff5_webstat\");\n\nif (stat===undefined) {\n    stat = {count:0, OK:0, ECONNRESET:0, ENOTFOUND:0, ETIMEDOUT:0, other:0};\n}\nswitch (msg.statusCode) {\n    case 200:\n        stat.count++;\n        stat.OK++;\n        break;\n    case \"ECONNRESET\":\n        stat.count++;\n        stat.ECONNRESET++;\n        break;\n    case \"ENOTFOUND\":\n        stat.count++;\n        stat.ENOTFOUND++;\n        break;\n    case \"ETIMEDOUT\":\n        stat.count++;\n        stat.ETIMEDOUT++;\n        break;\n    default:    \n        stat.count++;\n        stat.other++;\n}\n\nglobal.set(\"Sonoff5_webstat\",stat);\n\nreturn [\n    {topic:\"OK\", payload:stat.OK},\n    {topic:\"Connection reset\", payload:stat.ECONNRESET},\n    {topic:\"Timed out\", payload:stat.ETIMEDOUT},\n    {topic:\"Not found\", payload:stat.ENOTFOUND},\n    {topic:\"Other error\", payload:stat.other}\n    ];",
+        "outputs": "5",
+        "noerr": 0,
+        "x": 558.1666030883789,
+        "y": 1393.3333339691162,
+        "wires": [
+            [
+                "28bda36e.afa59c",
+                "4c839f1c.7714f"
+            ],
+            [
+                "28bda36e.afa59c",
+                "4c839f1c.7714f"
+            ],
+            [
+                "28bda36e.afa59c",
+                "4c839f1c.7714f"
+            ],
+            [
+                "28bda36e.afa59c",
+                "4c839f1c.7714f"
+            ],
+            [
+                "28bda36e.afa59c",
+                "4c839f1c.7714f"
+            ]
+        ]
+    },
+    {
+        "id": "28bda36e.afa59c",
+        "type": "ui_chart",
+        "z": "4f455b75.25e2a4",
+        "name": "Sonoff5 chart",
+        "group": "ab835ab6.361428",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "Web Config Response",
+        "chartType": "pie",
+        "legend": "true",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "x": 845.1666259765625,
+        "y": 1393.3333740234375,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "4c839f1c.7714f",
+        "type": "ui_chart",
+        "z": "4f455b75.25e2a4",
+        "name": "Sonoff5 chart",
+        "group": "ab835ab6.361428",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "x": 844.6666030883789,
+        "y": 1434.3333339691162,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "a02e72d5.5879e",
+        "type": "http request",
+        "z": "4f455b75.25e2a4",
+        "name": "Sonoff6 poll",
+        "method": "GET",
+        "ret": "txt",
+        "url": "http://192.168.1.133",
+        "tls": "",
+        "x": 317.16663360595703,
+        "y": 1479.3333339691162,
+        "wires": [
+            [
+                "d10b5304.2af9c"
+            ]
+        ]
+    },
+    {
+        "id": "d10b5304.2af9c",
+        "type": "function",
+        "z": "4f455b75.25e2a4",
+        "name": "Result calculator",
+        "func": "var stat = global.get(\"Sonoff6_webstat\");\n\nif (stat===undefined) {\n    stat = {count:0, OK:0, ECONNRESET:0, ENOTFOUND:0, ETIMEDOUT:0, other:0};\n}\nswitch (msg.statusCode) {\n    case 200:\n        stat.count++;\n        stat.OK++;\n        break;\n    case \"ECONNRESET\":\n        stat.count++;\n        stat.ECONNRESET++;\n        break;\n    case \"ENOTFOUND\":\n        stat.count++;\n        stat.ENOTFOUND++;\n        break;\n    case \"ETIMEDOUT\":\n        stat.count++;\n        stat.ETIMEDOUT++;\n        break;\n    default:    \n        stat.count++;\n        stat.other++;\n}\n\nglobal.set(\"Sonoff6_webstat\",stat);\n\nreturn [\n    {topic:\"OK\", payload:stat.OK},\n    {topic:\"Connection reset\", payload:stat.ECONNRESET},\n    {topic:\"Timed out\", payload:stat.ETIMEDOUT},\n    {topic:\"Not found\", payload:stat.ENOTFOUND},\n    {topic:\"Other error\", payload:stat.other}\n    ];\n",
+        "outputs": "5",
+        "noerr": 0,
+        "x": 553.1666030883789,
+        "y": 1477.3333339691162,
+        "wires": [
+            [
+                "c8ceac4c.ff80f",
+                "717b123.23209ec"
+            ],
+            [
+                "c8ceac4c.ff80f",
+                "717b123.23209ec"
+            ],
+            [
+                "c8ceac4c.ff80f",
+                "717b123.23209ec"
+            ],
+            [
+                "c8ceac4c.ff80f",
+                "717b123.23209ec"
+            ],
+            [
+                "717b123.23209ec",
+                "c8ceac4c.ff80f"
+            ]
+        ]
+    },
+    {
+        "id": "c8ceac4c.ff80f",
+        "type": "ui_chart",
+        "z": "4f455b75.25e2a4",
+        "name": "Sonoff6 chart",
+        "group": "aceb124.895fff",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "Web Config Response",
+        "chartType": "pie",
+        "legend": "true",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "x": 840.1666259765625,
+        "y": 1477.3333740234375,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "717b123.23209ec",
+        "type": "ui_chart",
+        "z": "4f455b75.25e2a4",
+        "name": "Sonoff6 chart",
+        "group": "aceb124.895fff",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": 0,
+        "x": 839.6666030883789,
+        "y": 1518.3333339691162,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "14cde41c.05a03c",
+        "type": "mqtt-broker",
+        "z": "",
+        "broker": "192.168.1.80",
+        "port": "1883",
+        "clientid": "node-red",
+        "usetls": false,
+        "compatmode": true,
+        "keepalive": "60",
+        "cleansession": true,
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": ""
+    },
+    {
+        "id": "1ebe3cff.b5c323",
+        "type": "ui_group",
+        "z": "",
+        "name": "Sonoff 1",
+        "tab": "477a03b3.d1e39c",
+        "order": 1,
+        "disp": true,
+        "width": "6"
+    },
+    {
+        "id": "28286248.b5db0e",
+        "type": "ui_group",
+        "z": "",
+        "name": "RGB",
+        "tab": "477a03b3.d1e39c",
+        "disp": true,
+        "width": "6"
+    },
+    {
+        "id": "c261ff7a.a6a4d",
+        "type": "ui_group",
+        "z": "",
+        "name": "Sonoff 2",
+        "tab": "477a03b3.d1e39c",
+        "order": 3,
+        "disp": true,
+        "width": "6"
+    },
+    {
+        "id": "4df39fa3.fc11",
+        "type": "ui_group",
+        "z": "",
+        "name": "Sonoff 3",
+        "tab": "477a03b3.d1e39c",
+        "order": 4,
+        "disp": true,
+        "width": "6"
+    },
+    {
+        "id": "7189a9d3.afd5b8",
+        "type": "ui_group",
+        "z": "",
+        "name": "Sonoff 4",
+        "tab": "477a03b3.d1e39c",
+        "order": 5,
+        "disp": true,
+        "width": "6"
+    },
+    {
+        "id": "ab835ab6.361428",
+        "type": "ui_group",
+        "z": "",
+        "name": "Sonoff 5",
+        "tab": "477a03b3.d1e39c",
+        "order": 6,
+        "disp": true,
+        "width": "6"
+    },
+    {
+        "id": "aceb124.895fff",
+        "type": "ui_group",
+        "z": "",
+        "name": "Sonoff 6",
+        "tab": "477a03b3.d1e39c",
+        "order": 7,
+        "disp": true,
+        "width": "6"
+    },
+    {
+        "id": "477a03b3.d1e39c",
+        "type": "ui_tab",
+        "z": "",
+        "name": "ESP Signal",
+        "icon": "network_check",
+        "order": 4
+    }
+]
