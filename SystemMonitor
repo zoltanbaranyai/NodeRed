@@ -1,0 +1,742 @@
+[
+    {
+        "id": "d7c669ce.519928",
+        "type": "exec",
+        "z": "996e03ce.e2a81",
+        "command": "",
+        "addpay": true,
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "oldrc": false,
+        "name": "Cpu temp",
+        "x": 300,
+        "y": 300,
+        "wires": [
+            [
+                "2b2bf914.f7b2d6",
+                "ea161e53.2fa03",
+                "c7f1c252.ffdef"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "6cd09403.37aafc",
+        "type": "inject",
+        "z": "996e03ce.e2a81",
+        "name": "",
+        "topic": "",
+        "payload": "cat /sys/devices/virtual/thermal/thermal_zone1/temp",
+        "payloadType": "str",
+        "repeat": "",
+        "crontab": "*/1 0-23 * * *",
+        "once": false,
+        "x": 120,
+        "y": 300,
+        "wires": [
+            [
+                "d7c669ce.519928"
+            ]
+        ]
+    },
+    {
+        "id": "2b2bf914.f7b2d6",
+        "type": "debug",
+        "z": "996e03ce.e2a81",
+        "name": "",
+        "active": false,
+        "console": "false",
+        "complete": "true",
+        "x": 490,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "ea161e53.2fa03",
+        "type": "ui_text",
+        "z": "996e03ce.e2a81",
+        "group": "55d37dcf.9ada74",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "Temperature cpu",
+        "label": "CPU Temperature: ",
+        "format": "{{msg.payload}} &degC",
+        "layout": "row-left",
+        "x": 530,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "ecf4760e.2ee3c8",
+        "type": "mqtt in",
+        "z": "996e03ce.e2a81",
+        "name": "",
+        "topic": "/Node101/System/Uptime",
+        "qos": "0",
+        "broker": "cb7ebda1.05ae7",
+        "x": 150,
+        "y": 520,
+        "wires": [
+            [
+                "b967fce3.38705",
+                "95db6e97.1b8e7"
+            ]
+        ]
+    },
+    {
+        "id": "b967fce3.38705",
+        "type": "debug",
+        "z": "996e03ce.e2a81",
+        "name": "",
+        "active": false,
+        "console": "false",
+        "complete": "false",
+        "x": 410,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "98b21f69.5bfa4",
+        "type": "comment",
+        "z": "996e03ce.e2a81",
+        "name": "Opi CPU Temperature",
+        "info": "",
+        "x": 120,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "6ad63a97.ef6564",
+        "type": "comment",
+        "z": "996e03ce.e2a81",
+        "name": "Node101",
+        "info": "",
+        "x": 80,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "95db6e97.1b8e7",
+        "type": "ui_text",
+        "z": "996e03ce.e2a81",
+        "group": "108aa17.27bd35f",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "Uptime",
+        "label": "Uptime",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 400,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "5c265d97.083304",
+        "type": "comment",
+        "z": "996e03ce.e2a81",
+        "name": "MQTT Server",
+        "info": "",
+        "x": 90,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "699868b2.0d8f18",
+        "type": "mosca in",
+        "z": "996e03ce.e2a81",
+        "mqtt_port": 1883,
+        "mqtt_ws_port": 8080,
+        "name": "",
+        "username": "",
+        "password": "",
+        "dburl": "",
+        "x": 150,
+        "y": 100,
+        "wires": [
+            [
+                "2cb50645.f948fa"
+            ]
+        ]
+    },
+    {
+        "id": "2cb50645.f948fa",
+        "type": "debug",
+        "z": "996e03ce.e2a81",
+        "name": "",
+        "active": false,
+        "console": "false",
+        "complete": "false",
+        "x": 370,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "b15946a2.4c3838",
+        "type": "mqtt in",
+        "z": "996e03ce.e2a81",
+        "name": "",
+        "topic": "/Node102/System/Uptime",
+        "qos": "0",
+        "broker": "cb7ebda1.05ae7",
+        "x": 150,
+        "y": 820,
+        "wires": [
+            [
+                "8a0b3d20.157dd",
+                "83d1d64f.f1ce38"
+            ]
+        ]
+    },
+    {
+        "id": "8a0b3d20.157dd",
+        "type": "debug",
+        "z": "996e03ce.e2a81",
+        "name": "",
+        "active": false,
+        "console": "false",
+        "complete": "false",
+        "x": 410,
+        "y": 820,
+        "wires": []
+    },
+    {
+        "id": "d2f1a9f1.033e58",
+        "type": "comment",
+        "z": "996e03ce.e2a81",
+        "name": "Node102",
+        "info": "",
+        "x": 80,
+        "y": 760,
+        "wires": []
+    },
+    {
+        "id": "83d1d64f.f1ce38",
+        "type": "ui_text",
+        "z": "996e03ce.e2a81",
+        "group": "d8c1ba95.518998",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "Uptime",
+        "label": "Uptime",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 400,
+        "y": 860,
+        "wires": []
+    },
+    {
+        "id": "f2a550b8.5d916",
+        "type": "mqtt in",
+        "z": "996e03ce.e2a81",
+        "name": "",
+        "topic": "/Node101/System/RSSI",
+        "qos": "0",
+        "broker": "cb7ebda1.05ae7",
+        "x": 150,
+        "y": 640,
+        "wires": [
+            [
+                "cc83159d.ad3e28",
+                "66692092.fa55"
+            ]
+        ]
+    },
+    {
+        "id": "cc83159d.ad3e28",
+        "type": "debug",
+        "z": "996e03ce.e2a81",
+        "name": "",
+        "active": false,
+        "console": "false",
+        "complete": "false",
+        "x": 410,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "66692092.fa55",
+        "type": "ui_gauge",
+        "z": "996e03ce.e2a81",
+        "name": "",
+        "group": "108aa17.27bd35f",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "RSSI",
+        "label": "dB",
+        "format": "{{value}}",
+        "min": "-100",
+        "max": "-30",
+        "colors": [
+            "#ff0000",
+            "#e6e600",
+            "#00ff00"
+        ],
+        "seg1": "-80",
+        "seg2": "-67",
+        "x": 390,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "e81290df.15c59",
+        "type": "mqtt in",
+        "z": "996e03ce.e2a81",
+        "name": "",
+        "topic": "/Node102/System/RSSI",
+        "qos": "0",
+        "broker": "cb7ebda1.05ae7",
+        "x": 150,
+        "y": 940,
+        "wires": [
+            [
+                "8b4af54.e502a08",
+                "e9cc785d.989fc8"
+            ]
+        ]
+    },
+    {
+        "id": "8b4af54.e502a08",
+        "type": "debug",
+        "z": "996e03ce.e2a81",
+        "name": "",
+        "active": false,
+        "console": "false",
+        "complete": "false",
+        "x": 410,
+        "y": 940,
+        "wires": []
+    },
+    {
+        "id": "e9cc785d.989fc8",
+        "type": "ui_gauge",
+        "z": "996e03ce.e2a81",
+        "name": "",
+        "group": "d8c1ba95.518998",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "RSSI",
+        "label": "dB",
+        "format": "{{value}}",
+        "min": "-100",
+        "max": "-30",
+        "colors": [
+            "#ff0000",
+            "#e6e600",
+            "#00ff00"
+        ],
+        "seg1": "-80",
+        "seg2": "-67",
+        "x": 390,
+        "y": 980,
+        "wires": []
+    },
+    {
+        "id": "c7f1c252.ffdef",
+        "type": "ui_chart",
+        "z": "996e03ce.e2a81",
+        "name": "Temperature plot",
+        "group": "55d37dcf.9ada74",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "Temperature",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "linear",
+        "nodata": "No data",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": "12",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "x": 530,
+        "y": 340,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "7bd1e334.e4130c",
+        "type": "exec",
+        "z": "996e03ce.e2a81",
+        "command": "",
+        "addpay": true,
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "oldrc": false,
+        "name": "Cpu temp",
+        "x": 320,
+        "y": 1480,
+        "wires": [
+            [
+                "11a3ec4c.53fc44"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "11a3ec4c.53fc44",
+        "type": "debug",
+        "z": "996e03ce.e2a81",
+        "name": "",
+        "active": false,
+        "console": "false",
+        "complete": "true",
+        "x": 450,
+        "y": 1440,
+        "wires": []
+    },
+    {
+        "id": "9f3c5956.dd4488",
+        "type": "inject",
+        "z": "996e03ce.e2a81",
+        "name": "",
+        "topic": "",
+        "payload": "reboot",
+        "payloadType": "str",
+        "repeat": "",
+        "crontab": "*/1 0 * * *",
+        "once": false,
+        "x": 150,
+        "y": 1480,
+        "wires": [
+            [
+                "7bd1e334.e4130c"
+            ]
+        ]
+    },
+    {
+        "id": "fde11076.ec7ed",
+        "type": "comment",
+        "z": "996e03ce.e2a81",
+        "name": "Reboot Opi",
+        "info": "",
+        "x": 110,
+        "y": 1400,
+        "wires": []
+    },
+    {
+        "id": "6f5abc35.5014e4",
+        "type": "conf ping",
+        "z": "996e03ce.e2a81",
+        "name": "",
+        "host": "msg.host",
+        "timeout": "5",
+        "requests": "3",
+        "x": 400,
+        "y": 1640,
+        "wires": [
+            [
+                "602ea361.610dec"
+            ]
+        ]
+    },
+    {
+        "id": "602ea361.610dec",
+        "type": "debug",
+        "z": "996e03ce.e2a81",
+        "name": "",
+        "active": false,
+        "console": "false",
+        "complete": "true",
+        "x": 660,
+        "y": 1640,
+        "wires": []
+    },
+    {
+        "id": "7b9d3ed8.49aab",
+        "type": "inject",
+        "z": "996e03ce.e2a81",
+        "name": "",
+        "topic": "msg.host",
+        "payload": "192.168.1.100",
+        "payloadType": "str",
+        "repeat": "",
+        "crontab": "*/1 0 * * *",
+        "once": false,
+        "x": 210,
+        "y": 1640,
+        "wires": [
+            [
+                "6f5abc35.5014e4"
+            ]
+        ]
+    },
+    {
+        "id": "2b985278.37c50e",
+        "type": "comment",
+        "z": "996e03ce.e2a81",
+        "name": "Network map",
+        "info": "",
+        "x": 110,
+        "y": 1580,
+        "wires": []
+    },
+    {
+        "id": "8d37e203.0b3b4",
+        "type": "exec",
+        "z": "996e03ce.e2a81",
+        "command": "",
+        "addpay": true,
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "oldrc": false,
+        "name": "Cpu temp",
+        "x": 300,
+        "y": 1860,
+        "wires": [
+            [
+                "b7a323be.f9ee4"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "e31d24df.a5fdf8",
+        "type": "inject",
+        "z": "996e03ce.e2a81",
+        "name": "",
+        "topic": "",
+        "payload": "arp -a",
+        "payloadType": "str",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 120,
+        "y": 1860,
+        "wires": [
+            [
+                "8d37e203.0b3b4"
+            ]
+        ]
+    },
+    {
+        "id": "b7a323be.f9ee4",
+        "type": "debug",
+        "z": "996e03ce.e2a81",
+        "name": "",
+        "active": false,
+        "console": "false",
+        "complete": "true",
+        "x": 490,
+        "y": 1820,
+        "wires": []
+    },
+    {
+        "id": "4b4b5c56.3b6e84",
+        "type": "comment",
+        "z": "996e03ce.e2a81",
+        "name": "Network",
+        "info": "",
+        "x": 80,
+        "y": 1760,
+        "wires": []
+    },
+    {
+        "id": "db0830aa.77fc6",
+        "type": "mqtt in",
+        "z": "996e03ce.e2a81",
+        "name": "",
+        "topic": "/Node103/System/Uptime",
+        "qos": "0",
+        "broker": "cb7ebda1.05ae7",
+        "x": 170,
+        "y": 1120,
+        "wires": [
+            [
+                "2bcddf93.1dbd7",
+                "c390d4c9.b2d8d8"
+            ]
+        ]
+    },
+    {
+        "id": "2bcddf93.1dbd7",
+        "type": "debug",
+        "z": "996e03ce.e2a81",
+        "name": "",
+        "active": false,
+        "console": "false",
+        "complete": "false",
+        "x": 430,
+        "y": 1120,
+        "wires": []
+    },
+    {
+        "id": "47eeefb7.e321c",
+        "type": "comment",
+        "z": "996e03ce.e2a81",
+        "name": "Node103",
+        "info": "",
+        "x": 100,
+        "y": 1060,
+        "wires": []
+    },
+    {
+        "id": "c390d4c9.b2d8d8",
+        "type": "ui_text",
+        "z": "996e03ce.e2a81",
+        "group": "11ee7926.4d9f37",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "Uptime",
+        "label": "Uptime",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 420,
+        "y": 1160,
+        "wires": []
+    },
+    {
+        "id": "4b10955e.75481c",
+        "type": "mqtt in",
+        "z": "996e03ce.e2a81",
+        "name": "",
+        "topic": "/Node103/System/RSSI",
+        "qos": "0",
+        "broker": "cb7ebda1.05ae7",
+        "x": 170,
+        "y": 1240,
+        "wires": [
+            [
+                "1f306d16.426693",
+                "8d8e087b.220c08"
+            ]
+        ]
+    },
+    {
+        "id": "1f306d16.426693",
+        "type": "debug",
+        "z": "996e03ce.e2a81",
+        "name": "",
+        "active": false,
+        "console": "false",
+        "complete": "false",
+        "x": 430,
+        "y": 1240,
+        "wires": []
+    },
+    {
+        "id": "8d8e087b.220c08",
+        "type": "ui_gauge",
+        "z": "996e03ce.e2a81",
+        "name": "",
+        "group": "11ee7926.4d9f37",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "RSSI",
+        "label": "dB",
+        "format": "{{value}}",
+        "min": "-100",
+        "max": "-30",
+        "colors": [
+            "#ff0000",
+            "#e6e600",
+            "#00ff00"
+        ],
+        "seg1": "-80",
+        "seg2": "-67",
+        "x": 410,
+        "y": 1280,
+        "wires": []
+    },
+    {
+        "id": "55d37dcf.9ada74",
+        "type": "ui_group",
+        "z": "",
+        "name": "Opi Monitor",
+        "tab": "a6b99e49.99129",
+        "disp": true,
+        "width": "6",
+        "collapse": true
+    },
+    {
+        "id": "cb7ebda1.05ae7",
+        "type": "mqtt-broker",
+        "z": "",
+        "broker": "Localhost",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": true,
+        "keepalive": "60",
+        "cleansession": true,
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": ""
+    },
+    {
+        "id": "108aa17.27bd35f",
+        "type": "ui_group",
+        "z": "",
+        "name": "Node101 Monitor",
+        "tab": "a6b99e49.99129",
+        "disp": true,
+        "width": "6",
+        "collapse": true
+    },
+    {
+        "id": "d8c1ba95.518998",
+        "type": "ui_group",
+        "z": "",
+        "name": "Node102 Monitor",
+        "tab": "a6b99e49.99129",
+        "disp": true,
+        "width": "6",
+        "collapse": true
+    },
+    {
+        "id": "11ee7926.4d9f37",
+        "type": "ui_group",
+        "z": "",
+        "name": "Node103 Monitor",
+        "tab": "a6b99e49.99129",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": true
+    },
+    {
+        "id": "a6b99e49.99129",
+        "type": "ui_tab",
+        "z": "",
+        "name": "System Monitor",
+        "icon": "dashboard",
+        "order": 5
+    }
+]
