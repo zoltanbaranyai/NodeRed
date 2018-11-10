@@ -1,0 +1,484 @@
+[
+    {
+        "id": "12a10e4c.f5c512",
+        "type": "inject",
+        "z": "cdb3a09c.1f994",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "3600",
+        "crontab": "",
+        "once": false,
+        "x": 114,
+        "y": 107,
+        "wires": [
+            [
+                "707bc43a.26580c",
+                "98719436.2878b8",
+                "4759f41c.2c9e7c",
+                "c9ec5de.68f18a"
+            ]
+        ]
+    },
+    {
+        "id": "707bc43a.26580c",
+        "type": "exec",
+        "z": "cdb3a09c.1f994",
+        "command": "snmpwalk -v 2c -c public 192.168.1.55 1.3.6.1.2.1.43.11.1.1.8.1.1",
+        "addpay": true,
+        "append": "",
+        "useSpawn": "",
+        "timer": "",
+        "name": "Toner Max",
+        "x": 310,
+        "y": 102.5,
+        "wires": [
+            [
+                "532eea0.b2c7618"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "43f61a7e.3f8d14",
+        "type": "join",
+        "z": "cdb3a09c.1f994",
+        "name": "",
+        "mode": "custom",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "timeout": "20",
+        "count": "4",
+        "x": 692,
+        "y": 151,
+        "wires": [
+            [
+                "6190c56e.43948c"
+            ]
+        ]
+    },
+    {
+        "id": "532eea0.b2c7618",
+        "type": "function",
+        "z": "cdb3a09c.1f994",
+        "name": "Get details",
+        "func": "msg.topic = \"toner_max\";\nmsg.payload = parseInt(msg.payload.slice(msg.payload.indexOf(\":\")+2,1000).trim());\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 498,
+        "y": 89,
+        "wires": [
+            [
+                "43f61a7e.3f8d14"
+            ]
+        ]
+    },
+    {
+        "id": "9692ee5c.7cb86",
+        "type": "debug",
+        "z": "cdb3a09c.1f994",
+        "name": "",
+        "active": false,
+        "console": "false",
+        "complete": "false",
+        "x": 420,
+        "y": 441,
+        "wires": []
+    },
+    {
+        "id": "98719436.2878b8",
+        "type": "exec",
+        "z": "cdb3a09c.1f994",
+        "command": "snmpwalk -v 2c -c public 192.168.1.55 1.3.6.1.2.1.43.11.1.1.9.1.1",
+        "addpay": true,
+        "append": "",
+        "useSpawn": "",
+        "timer": "",
+        "name": "Toner Level",
+        "x": 310,
+        "y": 164,
+        "wires": [
+            [
+                "f6129a28.b3ab98"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "f6129a28.b3ab98",
+        "type": "function",
+        "z": "cdb3a09c.1f994",
+        "name": "Get details",
+        "func": "msg.topic = \"toner_level\";\nmsg.payload = parseInt(msg.payload.slice(msg.payload.indexOf(\":\")+2,1000).trim());\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 498,
+        "y": 150.5,
+        "wires": [
+            [
+                "43f61a7e.3f8d14"
+            ]
+        ]
+    },
+    {
+        "id": "4759f41c.2c9e7c",
+        "type": "exec",
+        "z": "cdb3a09c.1f994",
+        "command": "snmpwalk -v 2c -c public 192.168.1.55 1.3.6.1.2.1.43.10.2.1.4.1.1",
+        "addpay": true,
+        "append": "",
+        "useSpawn": "",
+        "timer": "",
+        "name": "Page count",
+        "x": 311,
+        "y": 223,
+        "wires": [
+            [
+                "7333ce52.df213"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "7333ce52.df213",
+        "type": "function",
+        "z": "cdb3a09c.1f994",
+        "name": "Get details",
+        "func": "msg.topic = \"page_count\";\nmsg.payload = parseInt(msg.payload.slice(msg.payload.indexOf(\":\")+2,1000).trim());\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 499,
+        "y": 209.5,
+        "wires": [
+            [
+                "43f61a7e.3f8d14"
+            ]
+        ]
+    },
+    {
+        "id": "6190c56e.43948c",
+        "type": "function",
+        "z": "cdb3a09c.1f994",
+        "name": "Calculation logic",
+        "func": "// Treshold toner level before notification is sent\nvar treshold = 10;\n\nmsg.payload.notification=false;\nif (msg.payload!==\"\" || msg.payload!==undefined) {\n    if (isNaN(msg.payload.toner_max) || isNaN(msg.payload.toner_level) || msg.payload.toner_max===null || msg.payload.toner_level===null) {\n        // No valid values returned, e.g. printer is turned off\n        msg.payload.toner_percentage=0;\n        msg.payload.valid=-1;\n    } else {\n        if (msg.payload.toner_max<0 || msg.payload.toner_level<0) {\n            // No measurable toner levels are returned\n            msg.payload.toner_percentage=\"unknown\";\n            msg.payload.valid=0;\n        } else {\n            // There are proper values returned\n            msg.payload.toner_percentage=Math.floor(msg.payload.toner_level/msg.payload.toner_max*100,0);\n            msg.payload.valid=1;\n            msg.payload.value1=\"Black toner\";\n            \n            // Check if the toner level is below treshold\n            if (msg.payload.toner_percentage<treshold) {\n                // Check if notification was sent already\n                if (!global.get(\"tonernotification\") || global.get(\"tonernotification\")===null ) {\n                    // Flag for notification and set the global variable\n                    msg.payload.notification=true;\n                    global.set(\"tonernotification\",true);\n                }\n            }\n            // This piece resets the notification if the toner got replaced and the\n            // toner percentage is up again\n            if (msg.payload.toner_percentage>treshold+10) {\n                if (global.get(\"tonernotification\")) {\n                    global.set(\"tonernotification\",false);\n                }\n            }\n        }\n    }\n} else {\n    // Something went completely sideways\n    msg.payload.toner_percentage=0;\n    msg.payload.valid=-2;\n}\n\n// Add formatted timestamp\nvar now = new Date();\nvar yyyy = now.getFullYear();\nvar mm = now.getMonth() < 9 ? \"0\" + (now.getMonth() + 1) : (now.getMonth() + 1); // getMonth() is zero-based\nvar dd  = now.getDate() < 10 ? \"0\" + now.getDate() : now.getDate();\nvar hh = now.getHours() < 10 ? \"0\" + now.getHours() : now.getHours();\nvar mmm  = now.getMinutes() < 10 ? \"0\" + now.getMinutes() : now.getMinutes();\nvar ss  = now.getSeconds() < 10 ? \"0\" + now.getSeconds() : now.getSeconds();\nmsg.payload.timestamp = dd + \".\" + mm + \".\" + yyyy + \" \" + hh + \":\" + mmm + \":\" + ss;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 218,
+        "y": 477,
+        "wires": [
+            [
+                "d636cefa.8c72d",
+                "9692ee5c.7cb86",
+                "64b259f7.edb0a8"
+            ]
+        ]
+    },
+    {
+        "id": "e54839ef.317c08",
+        "type": "comment",
+        "z": "cdb3a09c.1f994",
+        "name": "Get values with SNMP",
+        "info": "",
+        "x": 274,
+        "y": 42,
+        "wires": []
+    },
+    {
+        "id": "135cdd24.6d6973",
+        "type": "comment",
+        "z": "cdb3a09c.1f994",
+        "name": "Extract data",
+        "info": "",
+        "x": 494,
+        "y": 42,
+        "wires": []
+    },
+    {
+        "id": "d636cefa.8c72d",
+        "type": "switch",
+        "z": "cdb3a09c.1f994",
+        "name": "Check valid state",
+        "property": "payload.valid",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "0",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "1",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "outputs": 2,
+        "x": 629,
+        "y": 479,
+        "wires": [
+            [
+                "cb61403c.7b448",
+                "a9fed230.835e7"
+            ],
+            [
+                "cb61403c.7b448",
+                "2b6d32ea.c6145e",
+                "a9fed230.835e7"
+            ]
+        ]
+    },
+    {
+        "id": "cb61403c.7b448",
+        "type": "ui_text",
+        "z": "cdb3a09c.1f994",
+        "group": "9ce27805.f420f8",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "Page Count",
+        "label": "Page Count",
+        "format": "{{msg.payload.page_count}}",
+        "layout": "row-spread",
+        "x": 865,
+        "y": 478,
+        "wires": []
+    },
+    {
+        "id": "2b6d32ea.c6145e",
+        "type": "ui_text",
+        "z": "cdb3a09c.1f994",
+        "group": "9ce27805.f420f8",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "Toner level",
+        "label": "Toner",
+        "format": "{{msg.payload.page_percentage}} %",
+        "layout": "row-spread",
+        "x": 864,
+        "y": 525,
+        "wires": []
+    },
+    {
+        "id": "8f6cc462.93e5c8",
+        "type": "comment",
+        "z": "cdb3a09c.1f994",
+        "name": "UI Update",
+        "info": "",
+        "x": 619,
+        "y": 432,
+        "wires": []
+    },
+    {
+        "id": "64b259f7.edb0a8",
+        "type": "switch",
+        "z": "cdb3a09c.1f994",
+        "name": "Check notification flag",
+        "property": "payload.notification",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            }
+        ],
+        "checkall": "true",
+        "outputs": 1,
+        "x": 419,
+        "y": 669,
+        "wires": [
+            [
+                "642b23ca.6f6ccc"
+            ]
+        ]
+    },
+    {
+        "id": "9b865d77.98ea7",
+        "type": "function",
+        "z": "cdb3a09c.1f994",
+        "name": "Test data",
+        "func": "msg.payload= {toner_max: 100, toner_level :5, printer_name:\"RICOH SP 213SFNw (828e56)\"};\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 866,
+        "y": 285,
+        "wires": [
+            [
+                "6190c56e.43948c"
+            ]
+        ]
+    },
+    {
+        "id": "fae8d68f.1b9a48",
+        "type": "inject",
+        "z": "cdb3a09c.1f994",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 98,
+        "y": 745,
+        "wires": [
+            [
+                "3d0a4c43.1e9af4"
+            ]
+        ]
+    },
+    {
+        "id": "3d0a4c43.1e9af4",
+        "type": "function",
+        "z": "cdb3a09c.1f994",
+        "name": "Reset notification",
+        "func": "global.set(\"tonernotification\",false);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 315,
+        "y": 744,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "642b23ca.6f6ccc",
+        "type": "function",
+        "z": "cdb3a09c.1f994",
+        "name": "Format values",
+        "func": "return {\n    payload: {\n        value1 : msg.payload.value1,\n        value2 : msg.payload.printer_name,\n        value3 : \"\"\n    }\n};",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 683,
+        "y": 668,
+        "wires": [
+            [
+                "c1825546.852c88",
+                "ed02dbce.c52408"
+            ]
+        ]
+    },
+    {
+        "id": "c9ec5de.68f18a",
+        "type": "exec",
+        "z": "cdb3a09c.1f994",
+        "command": "snmpwalk -v 2c -c public 192.168.1.55 1.3.6.1.2.1.43.5.1.1.16.1",
+        "addpay": true,
+        "append": "",
+        "useSpawn": "",
+        "timer": "",
+        "name": "Page count",
+        "x": 311,
+        "y": 280,
+        "wires": [
+            [
+                "dc7376db.3cfa48"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "dc7376db.3cfa48",
+        "type": "function",
+        "z": "cdb3a09c.1f994",
+        "name": "Get details",
+        "func": "msg.topic = \"printer_name\";\nmsg.payload = msg.payload.slice(msg.payload.indexOf(\": \")+3,msg.payload.length-2).trim();\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 499,
+        "y": 266.5,
+        "wires": [
+            [
+                "43f61a7e.3f8d14"
+            ]
+        ]
+    },
+    {
+        "id": "c1825546.852c88",
+        "type": "debug",
+        "z": "cdb3a09c.1f994",
+        "name": "",
+        "active": false,
+        "console": "false",
+        "complete": "false",
+        "x": 866,
+        "y": 727,
+        "wires": []
+    },
+    {
+        "id": "ed02dbce.c52408",
+        "type": "http request",
+        "z": "cdb3a09c.1f994",
+        "name": "IFTTT Call",
+        "method": "POST",
+        "ret": "txt",
+        "url": "https://maker.ifttt.com/trigger/Toner/with/key/<your key>",
+        "tls": "",
+        "x": 900,
+        "y": 668,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "8492bdb8.8dd94",
+        "type": "inject",
+        "z": "cdb3a09c.1f994",
+        "name": "Test",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 707,
+        "y": 285,
+        "wires": [
+            [
+                "9b865d77.98ea7"
+            ]
+        ]
+    },
+    {
+        "id": "a9fed230.835e7",
+        "type": "ui_text",
+        "z": "cdb3a09c.1f994",
+        "group": "9ce27805.f420f8",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "Last update",
+        "label": "Last update: ",
+        "format": "{{msg.payload.timestamp}}",
+        "layout": "row-right",
+        "x": 864,
+        "y": 569,
+        "wires": []
+    },
+    {
+        "id": "9ce27805.f420f8",
+        "type": "ui_group",
+        "z": "",
+        "name": "Printer",
+        "tab": "9a1916a2.b6c338",
+        "order": 5,
+        "disp": true,
+        "width": "6"
+    },
+    {
+        "id": "9a1916a2.b6c338",
+        "type": "ui_tab",
+        "z": "",
+        "name": "Home",
+        "icon": "home",
+        "order": "1"
+    }
+]
