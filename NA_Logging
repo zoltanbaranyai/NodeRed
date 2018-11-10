@@ -1,0 +1,3008 @@
+[
+    {
+        "id": "9a79bbc9.3c1048",
+        "type": "inject",
+        "z": "2d3756de.a1160a",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "x": 117,
+        "y": 260,
+        "wires": [
+            [
+                "8780cd9d.e0fd3"
+            ]
+        ]
+    },
+    {
+        "id": "8780cd9d.e0fd3",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "SQL",
+        "func": "msg.topic = \"SELECT * FROM state ORDER BY sta_id\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 280,
+        "y": 260,
+        "wires": [
+            [
+                "86e7daf3.983018"
+            ]
+        ]
+    },
+    {
+        "id": "86e7daf3.983018",
+        "type": "sqlite",
+        "z": "2d3756de.a1160a",
+        "mydb": "ea1b8886.6582e8",
+        "name": "Diag DB",
+        "x": 444,
+        "y": 260,
+        "wires": [
+            [
+                "8de7a0e9.13085"
+            ]
+        ]
+    },
+    {
+        "id": "8de7a0e9.13085",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "Process states",
+        "func": "global.set(\"Diag_State_Buffer\",msg.payload);\n\nvar output = [];\nfor (var i = 0; i < msg.payload.length; i++) {\n    //output.push( \"[\"+msg.payload[i].id+\"] \"+msg.payload[i].caption);\n    obj = {};\n    \n    obj [\"[\"+msg.payload[i].sta_id+\"] \"+msg.payload[i].sta_title]=msg.payload[i].sta_id;\n    output.push(obj);\n}\nmsg.options = output;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 644,
+        "y": 261,
+        "wires": [
+            [
+                "7cb28ed1.8c682"
+            ]
+        ]
+    },
+    {
+        "id": "7cb28ed1.8c682",
+        "type": "ui_dropdown",
+        "z": "2d3756de.a1160a",
+        "name": "",
+        "label": "Select",
+        "group": "8aa00ad4.466278",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "options": [
+            {
+                "label": "",
+                "value": "",
+                "type": "str"
+            }
+        ],
+        "payload": "",
+        "topic": "",
+        "x": 830,
+        "y": 261,
+        "wires": [
+            [
+                "65d18616.5ab6a8"
+            ]
+        ]
+    },
+    {
+        "id": "e4dc3c0a.484dc",
+        "type": "ui_text_input",
+        "z": "2d3756de.a1160a",
+        "name": "",
+        "label": "Caption",
+        "group": "8aa00ad4.466278",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "mode": "text",
+        "delay": 300,
+        "topic": "",
+        "x": 847,
+        "y": 379,
+        "wires": [
+            [
+                "938b340e.00ca38"
+            ]
+        ]
+    },
+    {
+        "id": "1beacd67.65f7a3",
+        "type": "ui_colour_picker",
+        "z": "2d3756de.a1160a",
+        "name": "",
+        "label": "Color",
+        "group": "8aa00ad4.466278",
+        "format": "hex",
+        "outformat": "string",
+        "showSwatch": true,
+        "showPicker": false,
+        "showValue": false,
+        "showAlpha": false,
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "topic": "",
+        "x": 846,
+        "y": 423,
+        "wires": [
+            [
+                "2cfe1938.44d6a6"
+            ]
+        ]
+    },
+    {
+        "id": "65d18616.5ab6a8",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "SQL",
+        "func": "global.set(\"diag_state_selected\",msg.payload);\nmsg.topic = \"SELECT * FROM state WHERE sta_id=\" + msg.payload;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 119,
+        "y": 375,
+        "wires": [
+            [
+                "5a843a21.6d1df4"
+            ]
+        ]
+    },
+    {
+        "id": "5a843a21.6d1df4",
+        "type": "sqlite",
+        "z": "2d3756de.a1160a",
+        "mydb": "ea1b8886.6582e8",
+        "name": "Diag DB",
+        "x": 283,
+        "y": 375,
+        "wires": [
+            [
+                "1e2c962f.4820aa"
+            ]
+        ]
+    },
+    {
+        "id": "1e2c962f.4820aa",
+        "type": "switch",
+        "z": "2d3756de.a1160a",
+        "name": "If no data",
+        "property": "payload.length",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gt",
+                "v": "0",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "outputs": 1,
+        "x": 449,
+        "y": 375,
+        "wires": [
+            [
+                "37d583ad.5afe4c",
+                "cdd3f65e.22db88",
+                "a6dd87ff.d2b708"
+            ]
+        ]
+    },
+    {
+        "id": "37d583ad.5afe4c",
+        "type": "change",
+        "z": "2d3756de.a1160a",
+        "name": "Format data",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload[0].sta_title",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 649,
+        "y": 379,
+        "wires": [
+            [
+                "e4dc3c0a.484dc"
+            ]
+        ]
+    },
+    {
+        "id": "cdd3f65e.22db88",
+        "type": "change",
+        "z": "2d3756de.a1160a",
+        "name": "Format data",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload[0].sta_color",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 647,
+        "y": 423,
+        "wires": [
+            [
+                "1beacd67.65f7a3"
+            ]
+        ]
+    },
+    {
+        "id": "70491540.d8ebbc",
+        "type": "ui_numeric",
+        "z": "2d3756de.a1160a",
+        "name": "",
+        "label": "ID",
+        "group": "8aa00ad4.466278",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "topic": "",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "100",
+        "step": 1,
+        "x": 840,
+        "y": 342,
+        "wires": [
+            [
+                "16065ac3.660f85"
+            ]
+        ]
+    },
+    {
+        "id": "a6dd87ff.d2b708",
+        "type": "change",
+        "z": "2d3756de.a1160a",
+        "name": "Format data",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload[0].sta_id",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 654,
+        "y": 342,
+        "wires": [
+            [
+                "70491540.d8ebbc"
+            ]
+        ]
+    },
+    {
+        "id": "22896c48.523f04",
+        "type": "ui_button",
+        "z": "2d3756de.a1160a",
+        "name": "",
+        "group": "8aa00ad4.466278",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "Create New",
+        "color": "",
+        "bgcolor": "",
+        "icon": "add",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "",
+        "x": 108,
+        "y": 189,
+        "wires": [
+            [
+                "e6a7a51b.b8a618"
+            ]
+        ]
+    },
+    {
+        "id": "e6a7a51b.b8a618",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "SQL",
+        "func": "msg.topic = \"INSERT INTO state (sta_id,sta_caption,sta_color) VALUES (101,'New state','ffffff')\";\nglobal.set(\"diag_state_selected\",undefined);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 293,
+        "y": 189,
+        "wires": [
+            [
+                "99ad6de2.586da"
+            ]
+        ]
+    },
+    {
+        "id": "99ad6de2.586da",
+        "type": "sqlite",
+        "z": "2d3756de.a1160a",
+        "mydb": "ea1b8886.6582e8",
+        "name": "Diag DB",
+        "x": 457,
+        "y": 189,
+        "wires": [
+            [
+                "8780cd9d.e0fd3",
+                "6c96e026.3ff36"
+            ]
+        ]
+    },
+    {
+        "id": "16065ac3.660f85",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "Store value",
+        "func": "global.set(\"diag_state_id\",msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1026,
+        "y": 341,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "938b340e.00ca38",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "Store value",
+        "func": "global.set(\"diag_state_caption\",msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1028,
+        "y": 379,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "2cfe1938.44d6a6",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "Store value",
+        "func": "global.set(\"diag_state_color\",msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1031,
+        "y": 419,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "937369f8.954768",
+        "type": "ui_button",
+        "z": "2d3756de.a1160a",
+        "name": "",
+        "group": "8aa00ad4.466278",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "Update selected",
+        "color": "",
+        "bgcolor": "#FF9000",
+        "icon": "mode_edit",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "",
+        "x": 116,
+        "y": 145,
+        "wires": [
+            [
+                "add4376a.685f78"
+            ]
+        ]
+    },
+    {
+        "id": "add4376a.685f78",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "SQL",
+        "func": "if (global.get(\"diag_state_selected\")!==undefined) {\n    msg.topic = \"UPDATE state SET \";\n    if (global.get(\"diag_state_id\")!==undefined) {\n        msg.topic = msg.topic+ \"sta_id=\"+global.get(\"diag_state_id\")+\", \";\n    }\n    if (global.get(\"diag_state_caption\")!==undefined) {\n        msg.topic = msg.topic+ \"sta_name='\"+global.get(\"diag_state_caption\")+\"', \";\n    }\n    if (global.get(\"diag_state_color\")!==undefined) {\n        msg.topic = msg.topic+ \"sta_color='\"+global.get(\"diag_state_color\")+\"', \";\n    }\n    msg.topic = msg.topic.substring(0,msg.topic.length-2);\n    msg.topic = msg.topic+ \" WHERE sta_id=\"+global.get(\"diag_state_selected\");\n    global.set(\"diag_state_selected\",undefined);\n    global.set(\"diag_state_id\",undefined);\n    global.set(\"diag_state_caption\",undefined);\n    global.set(\"diag_state_color\",undefined);\n} else {\n    msg.topic = \"\";\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 291,
+        "y": 145,
+        "wires": [
+            [
+                "6e0d5ae.3e10aa4"
+            ]
+        ]
+    },
+    {
+        "id": "6e0d5ae.3e10aa4",
+        "type": "sqlite",
+        "z": "2d3756de.a1160a",
+        "mydb": "ea1b8886.6582e8",
+        "name": "Diag DB",
+        "x": 459,
+        "y": 143,
+        "wires": [
+            [
+                "8780cd9d.e0fd3",
+                "2f5c9761.4ba648"
+            ]
+        ]
+    },
+    {
+        "id": "552a2e05.28b53",
+        "type": "ui_button",
+        "z": "2d3756de.a1160a",
+        "name": "",
+        "group": "8aa00ad4.466278",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "Delete selected",
+        "color": "",
+        "bgcolor": "#ff5555",
+        "icon": "delete",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "",
+        "x": 117,
+        "y": 97,
+        "wires": [
+            [
+                "61cffc31.63a424"
+            ]
+        ]
+    },
+    {
+        "id": "61cffc31.63a424",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "SQL",
+        "func": "if (global.get(\"diag_state_selected\")!==undefined) {\n    msg.topic = \"DELETE FROM state WHERE sta_id=\"+global.get(\"diag_state_selected\");\n    global.set(\"diag_state_selected\",undefined);\n    global.set(\"diag_state_id\",undefined);\n    global.set(\"diag_state_caption\",undefined);\n    global.set(\"diag_state_color\",undefined);\n} else {\n    msg.topic = \"\";\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 292,
+        "y": 97,
+        "wires": [
+            [
+                "cedcba82.1d1cd8"
+            ]
+        ]
+    },
+    {
+        "id": "cedcba82.1d1cd8",
+        "type": "sqlite",
+        "z": "2d3756de.a1160a",
+        "mydb": "ea1b8886.6582e8",
+        "name": "Diag DB",
+        "x": 458,
+        "y": 98,
+        "wires": [
+            [
+                "8780cd9d.e0fd3",
+                "196077bf.edfd78"
+            ]
+        ]
+    },
+    {
+        "id": "6102c1ca.f0805",
+        "type": "comment",
+        "z": "2d3756de.a1160a",
+        "name": "Maintenance of the State table",
+        "info": "",
+        "x": 165,
+        "y": 50,
+        "wires": []
+    },
+    {
+        "id": "1b12dcee.b59423",
+        "type": "ui_toast",
+        "z": "2d3756de.a1160a",
+        "position": "top right",
+        "displayTime": "3",
+        "outputs": 0,
+        "ok": "OK",
+        "cancel": "",
+        "topic": "",
+        "name": "",
+        "x": 969,
+        "y": 143,
+        "wires": []
+    },
+    {
+        "id": "196077bf.edfd78",
+        "type": "change",
+        "z": "2d3756de.a1160a",
+        "name": "Toast msg",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "Selected entry has been deleted",
+                "tot": "str"
+            },
+            {
+                "t": "delete",
+                "p": "payload",
+                "pt": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 693.5,
+        "y": 97,
+        "wires": [
+            [
+                "1b12dcee.b59423"
+            ]
+        ]
+    },
+    {
+        "id": "2f5c9761.4ba648",
+        "type": "change",
+        "z": "2d3756de.a1160a",
+        "name": "Toast msg",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "Selected entry has been updated",
+                "tot": "str"
+            },
+            {
+                "t": "delete",
+                "p": "payload",
+                "pt": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 694,
+        "y": 147,
+        "wires": [
+            [
+                "1b12dcee.b59423"
+            ]
+        ]
+    },
+    {
+        "id": "6c96e026.3ff36",
+        "type": "change",
+        "z": "2d3756de.a1160a",
+        "name": "Toast msg",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "New entry has been created",
+                "tot": "str"
+            },
+            {
+                "t": "delete",
+                "p": "payload",
+                "pt": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 694,
+        "y": 192,
+        "wires": [
+            [
+                "1b12dcee.b59423"
+            ]
+        ]
+    },
+    {
+        "id": "1793d846.b42bd8",
+        "type": "inject",
+        "z": "2d3756de.a1160a",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "x": 143,
+        "y": 689,
+        "wires": [
+            [
+                "e65bbb7d.35bb98"
+            ]
+        ]
+    },
+    {
+        "id": "e65bbb7d.35bb98",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "SQL",
+        "func": "msg.topic = \"SELECT * FROM system ORDER BY sys_id\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 306,
+        "y": 689,
+        "wires": [
+            [
+                "b52ab7c8.7a7e28"
+            ]
+        ]
+    },
+    {
+        "id": "b52ab7c8.7a7e28",
+        "type": "sqlite",
+        "z": "2d3756de.a1160a",
+        "mydb": "ea1b8886.6582e8",
+        "name": "Diag DB",
+        "x": 470,
+        "y": 689,
+        "wires": [
+            [
+                "1740b3b3.d7ee8c",
+                "5e16fc77.48c854"
+            ]
+        ]
+    },
+    {
+        "id": "1740b3b3.d7ee8c",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "Process systems",
+        "func": "global.set(\"Diag_System_Buffer\",msg.payload);\n\nvar output = [];\nfor (var i = 0; i < msg.payload.length; i++) {\n    //output.push( \"[\"+msg.payload[i].id+\"] \"+msg.payload[i].caption);\n    obj = {};\n    \n    obj [\"[\"+msg.payload[i].sys_id+\"] \"+msg.payload[i].sys_name]=msg.payload[i].sys_id;\n    output.push(obj);\n}\nmsg.options = output;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 680,
+        "y": 690,
+        "wires": [
+            [
+                "5fcfda18.ab74a4"
+            ]
+        ]
+    },
+    {
+        "id": "5fcfda18.ab74a4",
+        "type": "ui_dropdown",
+        "z": "2d3756de.a1160a",
+        "name": "",
+        "label": "Select",
+        "group": "c12f5635.0918d8",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "options": [
+            {
+                "label": "",
+                "value": "",
+                "type": "str"
+            }
+        ],
+        "payload": "",
+        "topic": "",
+        "x": 856,
+        "y": 690,
+        "wires": [
+            [
+                "2575098b.7d1886"
+            ]
+        ]
+    },
+    {
+        "id": "c45efdbc.9e871",
+        "type": "ui_text_input",
+        "z": "2d3756de.a1160a",
+        "name": "",
+        "label": "Name",
+        "group": "c12f5635.0918d8",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "mode": "text",
+        "delay": 300,
+        "topic": "",
+        "x": 863,
+        "y": 808,
+        "wires": [
+            [
+                "895a529a.86a9c"
+            ]
+        ]
+    },
+    {
+        "id": "2575098b.7d1886",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "SQL",
+        "func": "global.set(\"diag_system_selected\",msg.payload);\nmsg.topic = \"SELECT * FROM system WHERE sys_id=\" + msg.payload;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 145,
+        "y": 804,
+        "wires": [
+            [
+                "50e8fa19.f77c44"
+            ]
+        ]
+    },
+    {
+        "id": "50e8fa19.f77c44",
+        "type": "sqlite",
+        "z": "2d3756de.a1160a",
+        "mydb": "ea1b8886.6582e8",
+        "name": "Diag DB",
+        "x": 309,
+        "y": 804,
+        "wires": [
+            [
+                "d6395d35.6bba9"
+            ]
+        ]
+    },
+    {
+        "id": "d6395d35.6bba9",
+        "type": "switch",
+        "z": "2d3756de.a1160a",
+        "name": "If no data",
+        "property": "payload.length",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gt",
+                "v": "0",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "outputs": 1,
+        "x": 475,
+        "y": 804,
+        "wires": [
+            [
+                "cdeaee78.c0555",
+                "58d2e72b.44f2a8"
+            ]
+        ]
+    },
+    {
+        "id": "cdeaee78.c0555",
+        "type": "change",
+        "z": "2d3756de.a1160a",
+        "name": "Format data",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload[0].sys_name",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 675,
+        "y": 808,
+        "wires": [
+            [
+                "c45efdbc.9e871"
+            ]
+        ]
+    },
+    {
+        "id": "aab3bfa6.b33f6",
+        "type": "ui_numeric",
+        "z": "2d3756de.a1160a",
+        "name": "",
+        "label": "ID",
+        "group": "c12f5635.0918d8",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "topic": "",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "100",
+        "step": 1,
+        "x": 866,
+        "y": 771,
+        "wires": [
+            [
+                "dbb95d96.b4ea8"
+            ]
+        ]
+    },
+    {
+        "id": "58d2e72b.44f2a8",
+        "type": "change",
+        "z": "2d3756de.a1160a",
+        "name": "Format data",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload[0].sys_id",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 680,
+        "y": 771,
+        "wires": [
+            [
+                "aab3bfa6.b33f6"
+            ]
+        ]
+    },
+    {
+        "id": "90ce77bc.c30df8",
+        "type": "ui_button",
+        "z": "2d3756de.a1160a",
+        "name": "",
+        "group": "c12f5635.0918d8",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "Create New",
+        "color": "",
+        "bgcolor": "",
+        "icon": "add",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "",
+        "x": 134,
+        "y": 618,
+        "wires": [
+            [
+                "c6140126.937b1"
+            ]
+        ]
+    },
+    {
+        "id": "c6140126.937b1",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "SQL",
+        "func": "msg.topic = \"INSERT INTO system (sys_id,sys_name,sys_state) VALUES (101,'New system',0)\";\nglobal.set(\"diag_system_selected\",undefined);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 319,
+        "y": 618,
+        "wires": [
+            [
+                "7905a186.23882"
+            ]
+        ]
+    },
+    {
+        "id": "7905a186.23882",
+        "type": "sqlite",
+        "z": "2d3756de.a1160a",
+        "mydb": "ea1b8886.6582e8",
+        "name": "Diag DB",
+        "x": 483,
+        "y": 618,
+        "wires": [
+            [
+                "e65bbb7d.35bb98",
+                "ed43c63c.951ec8"
+            ]
+        ]
+    },
+    {
+        "id": "dbb95d96.b4ea8",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "Store value",
+        "func": "global.set(\"diag_system_id\",msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1052,
+        "y": 770,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "895a529a.86a9c",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "Store value",
+        "func": "global.set(\"diag_system_name\",msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1054,
+        "y": 808,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f0f27c3.cd7b58",
+        "type": "ui_button",
+        "z": "2d3756de.a1160a",
+        "name": "",
+        "group": "c12f5635.0918d8",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "Update selected",
+        "color": "",
+        "bgcolor": "#FF9000",
+        "icon": "mode_edit",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "",
+        "x": 142,
+        "y": 574,
+        "wires": [
+            [
+                "31086c74.a0c4d4"
+            ]
+        ]
+    },
+    {
+        "id": "31086c74.a0c4d4",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "SQL",
+        "func": "if (global.get(\"diag_system_selected\")!==undefined) {\n    msg.topic = \"UPDATE system SET \";\n    if (global.get(\"diag_system_id\")!==undefined) {\n        msg.topic = msg.topic+ \"sys_id=\"+global.get(\"diag_system_id\")+\", \";\n    }\n    if (global.get(\"diag_system_name\")!==undefined) {\n        msg.topic = msg.topic+ \"sys_name='\"+global.get(\"diag_system_name\")+\"', \";\n    }\n    msg.topic = msg.topic.substring(0,msg.topic.length-2);\n    msg.topic = msg.topic+ \" WHERE sys_id=\"+global.get(\"diag_system_selected\");\n    global.set(\"diag_system_selected\",undefined);\n    global.set(\"diag_system_id\",undefined);\n    global.set(\"diag_system_name\",undefined);\n} else {\n    msg.topic = \"\";\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 317,
+        "y": 574,
+        "wires": [
+            [
+                "24a7e200.486e4e"
+            ]
+        ]
+    },
+    {
+        "id": "24a7e200.486e4e",
+        "type": "sqlite",
+        "z": "2d3756de.a1160a",
+        "mydb": "ea1b8886.6582e8",
+        "name": "Diag DB",
+        "x": 485,
+        "y": 572,
+        "wires": [
+            [
+                "e65bbb7d.35bb98",
+                "d6a103ca.f04d7"
+            ]
+        ]
+    },
+    {
+        "id": "1a781ce5.3799d3",
+        "type": "ui_button",
+        "z": "2d3756de.a1160a",
+        "name": "",
+        "group": "c12f5635.0918d8",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "Delete selected",
+        "color": "",
+        "bgcolor": "#ff5555",
+        "icon": "delete",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "",
+        "x": 143,
+        "y": 526,
+        "wires": [
+            [
+                "798cbbd8.daf844"
+            ]
+        ]
+    },
+    {
+        "id": "798cbbd8.daf844",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "SQL",
+        "func": "if (global.get(\"diag_system_selected\")!==undefined) {\n    msg.topic = \"DELETE FROM system WHERE sys_id=\"+global.get(\"diag_system_selected\");\n    global.set(\"diag_system_selected\",undefined);\n    global.set(\"diag_system_id\",undefined);\n    global.set(\"diag_system_name\",undefined);\n} else {\n    msg.topic = \"\";\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 318,
+        "y": 526,
+        "wires": [
+            [
+                "ebb3c4d8.c02c68"
+            ]
+        ]
+    },
+    {
+        "id": "ebb3c4d8.c02c68",
+        "type": "sqlite",
+        "z": "2d3756de.a1160a",
+        "mydb": "ea1b8886.6582e8",
+        "name": "Diag DB",
+        "x": 484,
+        "y": 527,
+        "wires": [
+            [
+                "e65bbb7d.35bb98",
+                "c81a05fb.70be08"
+            ]
+        ]
+    },
+    {
+        "id": "d0dee13e.e3ebe",
+        "type": "comment",
+        "z": "2d3756de.a1160a",
+        "name": "Maintenance of the System table",
+        "info": "",
+        "x": 191,
+        "y": 479,
+        "wires": []
+    },
+    {
+        "id": "98843053.831ca",
+        "type": "ui_toast",
+        "z": "2d3756de.a1160a",
+        "position": "top right",
+        "displayTime": "3",
+        "outputs": 0,
+        "ok": "OK",
+        "cancel": "",
+        "topic": "",
+        "name": "",
+        "x": 995,
+        "y": 572,
+        "wires": []
+    },
+    {
+        "id": "c81a05fb.70be08",
+        "type": "change",
+        "z": "2d3756de.a1160a",
+        "name": "Toast msg",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "Selected entry has been deleted",
+                "tot": "str"
+            },
+            {
+                "t": "delete",
+                "p": "payload",
+                "pt": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 719.5,
+        "y": 526,
+        "wires": [
+            [
+                "98843053.831ca"
+            ]
+        ]
+    },
+    {
+        "id": "d6a103ca.f04d7",
+        "type": "change",
+        "z": "2d3756de.a1160a",
+        "name": "Toast msg",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "Selected entry has been updated",
+                "tot": "str"
+            },
+            {
+                "t": "delete",
+                "p": "payload",
+                "pt": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 720,
+        "y": 576,
+        "wires": [
+            [
+                "98843053.831ca"
+            ]
+        ]
+    },
+    {
+        "id": "ed43c63c.951ec8",
+        "type": "change",
+        "z": "2d3756de.a1160a",
+        "name": "Toast msg",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "New entry has been created",
+                "tot": "str"
+            },
+            {
+                "t": "delete",
+                "p": "payload",
+                "pt": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 720,
+        "y": 621,
+        "wires": [
+            [
+                "98843053.831ca"
+            ]
+        ]
+    },
+    {
+        "id": "c8416161.0c39b",
+        "type": "comment",
+        "z": "2d3756de.a1160a",
+        "name": "Receiving and processing messages",
+        "info": "",
+        "x": 205,
+        "y": 912,
+        "wires": []
+    },
+    {
+        "id": "99684984.c06638",
+        "type": "link in",
+        "z": "2d3756de.a1160a",
+        "name": "Diagnostic_Update",
+        "links": [
+            "a3d838d1.b2a3d8",
+            "1856177c.692aa9",
+            "e592d5a5.26bde8",
+            "b73c8744.8ec588",
+            "59df56a.e8d5aa8",
+            "6bc27c2.26eb584",
+            "b269471e.f03798",
+            "149d2576.aa372b",
+            "4f24cc12.704334",
+            "85f0d77.da83928",
+            "78fed854.1b6aa8",
+            "eaf2075b.f08f88",
+            "9371bd5d.293c2",
+            "8c6c56bb.efe678",
+            "2e75adec.578e52",
+            "d9ab022c.d40aa",
+            "7692ea3d.040324",
+            "5c63f003.554",
+            "89cc7882.52fb68",
+            "ee08c280.18881",
+            "31989b49.404cf4",
+            "1711c87b.c95a78",
+            "858824a8.955768",
+            "1ceba7.f7399459",
+            "8d86bc97.858bd",
+            "c1d8ef52.f0ff9"
+        ],
+        "x": 101,
+        "y": 1018,
+        "wires": [
+            [
+                "ba209809.a5e0e8",
+                "31974a42.1e4946",
+                "ef151df9.474cd",
+                "6492bee6.94dd8"
+            ]
+        ]
+    },
+    {
+        "id": "a37dcc66.aa6eb",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "Diagnostic input message structure",
+        "func": "msg.payload = \"This updates the system status as well\";\nmsg.system = 1; // System id, use 1 for Dummy\nmsg.state = 70; // specify if the message is to change system status\nmsg.severity = 0; // 0: information, 1: warning, 2: error\n//msg.email = true; // if separate email should be sent\n//msg.emailtext = \"\"; this a long text which goes into the email\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 400,
+        "y": 959,
+        "wires": [
+            [
+                "a3d838d1.b2a3d8"
+            ]
+        ]
+    },
+    {
+        "id": "ef4704ba.1ed528",
+        "type": "inject",
+        "z": "2d3756de.a1160a",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 117,
+        "y": 960,
+        "wires": [
+            [
+                "a37dcc66.aa6eb"
+            ]
+        ]
+    },
+    {
+        "id": "a3d838d1.b2a3d8",
+        "type": "link out",
+        "z": "2d3756de.a1160a",
+        "name": "",
+        "links": [
+            "99684984.c06638"
+        ],
+        "x": 627,
+        "y": 959,
+        "wires": []
+    },
+    {
+        "id": "ba209809.a5e0e8",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "Insert message record",
+        "func": "var d = new Date();\nvar epoch = d.getTime();\n\nif (msg.state>0) {\n    msg.topic = \"INSERT INTO message (msg_system,msg_severity,msg_text,msg_epoch,msg_newstate) VALUES (\"+msg.system+\",\"+msg.severity+\",'\"+msg.payload+\"',\"+epoch+\",\"+msg.state+\")\";\n} else {\n    msg.topic = \"INSERT INTO message (msg_system,msg_severity,msg_text,msg_epoch) VALUES (\"+msg.system+\",\"+msg.severity+\",'\"+msg.payload+\"',\"+epoch+\")\";\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 369,
+        "y": 1021,
+        "wires": [
+            [
+                "d016b98f.48c648"
+            ]
+        ]
+    },
+    {
+        "id": "d016b98f.48c648",
+        "type": "sqlite",
+        "z": "2d3756de.a1160a",
+        "mydb": "ea1b8886.6582e8",
+        "name": "Diag DB",
+        "x": 977,
+        "y": 1022,
+        "wires": [
+            [
+                "8f83b4b3.6b4dc8"
+            ]
+        ]
+    },
+    {
+        "id": "31974a42.1e4946",
+        "type": "switch",
+        "z": "2d3756de.a1160a",
+        "name": "Check status change",
+        "property": "state",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "nnull"
+            }
+        ],
+        "checkall": "true",
+        "outputs": 1,
+        "x": 371,
+        "y": 1077,
+        "wires": [
+            [
+                "22fba173.b8e26e",
+                "60cf0a5f.4befa4"
+            ]
+        ]
+    },
+    {
+        "id": "22fba173.b8e26e",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "Status update",
+        "func": "msg.topic = \"UPDATE system SET sys_state=\"+msg.state+\" WHERE sys_id=\"+msg.system;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 633,
+        "y": 1077,
+        "wires": [
+            [
+                "d016b98f.48c648"
+            ]
+        ]
+    },
+    {
+        "id": "ef151df9.474cd",
+        "type": "switch",
+        "z": "2d3756de.a1160a",
+        "name": "Check email",
+        "property": "email",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            }
+        ],
+        "checkall": "true",
+        "outputs": 1,
+        "x": 339,
+        "y": 1127,
+        "wires": [
+            [
+                "16e329b2.4a91f6"
+            ]
+        ]
+    },
+    {
+        "id": "a2838796.85a9e8",
+        "type": "e-mail",
+        "z": "2d3756de.a1160a",
+        "server": "smtp.gmail.com",
+        "port": "465",
+        "secure": true,
+        "name": "csongor.varga@gmail.com",
+        "dname": "Email notification",
+        "x": 935.8888702392578,
+        "y": 1121.3332824707031,
+        "wires": []
+    },
+    {
+        "id": "16e329b2.4a91f6",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "Email content",
+        "func": "msg.topic=msg.payload;\nmsg.payload = msg.emailtext;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 583,
+        "y": 1127,
+        "wires": [
+            [
+                "a2838796.85a9e8"
+            ]
+        ]
+    },
+    {
+        "id": "67a0aeda.be712",
+        "type": "comment",
+        "z": "2d3756de.a1160a",
+        "name": "System status display",
+        "info": "",
+        "x": 171,
+        "y": 1243,
+        "wires": []
+    },
+    {
+        "id": "e25a8b61.420ea8",
+        "type": "template",
+        "z": "2d3756de.a1160a",
+        "name": "Formatting",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<table>\n    {{#payload}}\n        <tr>\n            <td style=\"background-color: {{sta_color}};\">{{sys_name}}</td>\n            <td style=\"background-color: {{sta_color}};\">{{sta_title}}</td>\n        </tr>\n    {{/payload}}\n</table>\n",
+        "x": 712,
+        "y": 1326,
+        "wires": [
+            [
+                "8d61d052.611cd",
+                "728236e8.c51f18"
+            ]
+        ]
+    },
+    {
+        "id": "8d61d052.611cd",
+        "type": "ui_template",
+        "z": "2d3756de.a1160a",
+        "group": "f546b57b.ffc4c8",
+        "name": "Status list",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "format": "<div ng-bind-html=\"msg.payload\" style=\"height:100%;\"></div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "x": 918,
+        "y": 1324,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "8f83b4b3.6b4dc8",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "SQL",
+        "func": "msg.topic = \"SELECT * FROM system, state WHERE sys_state = sta_id ORDER BY sys_id\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 299,
+        "y": 1325,
+        "wires": [
+            [
+                "ea0489e4.187148"
+            ]
+        ]
+    },
+    {
+        "id": "ea0489e4.187148",
+        "type": "sqlite",
+        "z": "2d3756de.a1160a",
+        "mydb": "ea1b8886.6582e8",
+        "name": "Diag DB",
+        "x": 472,
+        "y": 1326,
+        "wires": [
+            [
+                "e25a8b61.420ea8",
+                "728236e8.c51f18"
+            ]
+        ]
+    },
+    {
+        "id": "f062a2a7.9c045",
+        "type": "inject",
+        "z": "2d3756de.a1160a",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "x": 132,
+        "y": 1325,
+        "wires": [
+            [
+                "8f83b4b3.6b4dc8"
+            ]
+        ]
+    },
+    {
+        "id": "728236e8.c51f18",
+        "type": "debug",
+        "z": "2d3756de.a1160a",
+        "name": "",
+        "active": false,
+        "console": "false",
+        "complete": "false",
+        "x": 924,
+        "y": 1393,
+        "wires": []
+    },
+    {
+        "id": "3545168c.f78bea",
+        "type": "comment",
+        "z": "2d3756de.a1160a",
+        "name": "Message Log",
+        "info": "",
+        "x": 128,
+        "y": 1483,
+        "wires": []
+    },
+    {
+        "id": "8da2858f.242708",
+        "type": "template",
+        "z": "2d3756de.a1160a",
+        "name": "Formatting",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<table>\n    <tr><th>Severity</th><th>Timestamp</th><th>System</th><th>Message</th></tr>\n    {{#payload}}\n        <tr class=\"\">\n            <td>{{msg_severity}}</td>\n            <td>{{msg_timestamp}}</td>\n            <td>{{sys_name}}</td>\n            <td>{{msg_text}}</td>\n        </tr>\n    {{/payload}}\n</table>\n",
+        "x": 727,
+        "y": 1878,
+        "wires": [
+            [
+                "5da833af.b250cc"
+            ]
+        ]
+    },
+    {
+        "id": "5da833af.b250cc",
+        "type": "ui_template",
+        "z": "2d3756de.a1160a",
+        "group": "903670bb.151f8",
+        "name": "Log output",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "format": "<div ng-bind-html=\"msg.payload\" style=\"height:400;\"></div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "x": 948,
+        "y": 1878,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "358ad3b0.3c764c",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "SQL",
+        "func": "context.set(msg.topic,msg.payload);\n\nvar d = new Date();\nvar epoch = d.getTime();\nvar fromdate = 0;\nvar enddate = 0;\n\nmsg.topic = \"SELECT * FROM message, system WHERE msg_system = sys_id \";\n\nif (context.get(\"msg_severity\")!==undefined) {\n    if (context.get(\"msg_severity\")!==\"*\") {\n        msg.topic = msg.topic + \" AND msg_severity = \"+context.get(\"msg_severity\");\n    }\n}\n\nif (context.get(\"msg_system\")!==undefined) {\n    if (context.get(\"msg_system\")!==\"*\") {\n        msg.topic = msg.topic + \" AND msg_system = \"+context.get(\"msg_system\");\n    }\n}\n\nif (context.get(\"msg_newstate\")===1) {\n    msg.topic = msg.topic + \" AND msg_newstate IS NOT NULL \";\n}\n\nif (context.get(\"msg_time\")!==undefined) {\n    switch (context.get(\"msg_time\")) {\n        case 0:\n            fromdate = epoch - 1000*60*60*24;\n            msg.topic = msg.topic + \" AND msg_epoch > \"+fromdate;\n            break;\n        case 1:\n            fromdate = epoch - 1000*60*60*24*7;\n            msg.topic = msg.topic + \" AND msg_epoch > \"+fromdate;\n            break;\n        case 2:\n            fromdate = epoch - 1000*60*60*24*30;\n            msg.topic = msg.topic + \" AND msg_epoch > \"+fromdate;\n            break;\n    }\n}\n\n// msg.topic = msg.topic.substring(0,msg.topic.length-2);\nmsg.topic = msg.topic+ \" ORDER BY msg_id\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 314,
+        "y": 1877,
+        "wires": [
+            [
+                "f6d032c0.5ee6b"
+            ]
+        ]
+    },
+    {
+        "id": "f6d032c0.5ee6b",
+        "type": "sqlite",
+        "z": "2d3756de.a1160a",
+        "mydb": "ea1b8886.6582e8",
+        "name": "Diag DB",
+        "x": 502,
+        "y": 1877,
+        "wires": [
+            [
+                "8da2858f.242708"
+            ]
+        ]
+    },
+    {
+        "id": "c9c087e3.e54d88",
+        "type": "inject",
+        "z": "2d3756de.a1160a",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 147,
+        "y": 1877,
+        "wires": [
+            [
+                "358ad3b0.3c764c"
+            ]
+        ]
+    },
+    {
+        "id": "3cfe9bef.005464",
+        "type": "ui_button",
+        "z": "2d3756de.a1160a",
+        "name": "",
+        "group": "903670bb.151f8",
+        "order": 2,
+        "width": "3",
+        "height": "1",
+        "label": "Refresh",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "msg_refresh",
+        "x": 550,
+        "y": 1587,
+        "wires": [
+            [
+                "358ad3b0.3c764c"
+            ]
+        ]
+    },
+    {
+        "id": "f3203af9.e03fb8",
+        "type": "ui_dropdown",
+        "z": "2d3756de.a1160a",
+        "name": "Severity",
+        "label": "",
+        "group": "903670bb.151f8",
+        "order": 3,
+        "width": "4",
+        "height": "1",
+        "passthru": true,
+        "options": [
+            {
+                "label": "All severity",
+                "value": "*",
+                "type": "str"
+            },
+            {
+                "label": "Information only",
+                "value": 0,
+                "type": "num"
+            },
+            {
+                "label": "Warnings only",
+                "value": 1,
+                "type": "num"
+            },
+            {
+                "label": "Errors only",
+                "value": 2,
+                "type": "num"
+            }
+        ],
+        "payload": "",
+        "topic": "msg_severity",
+        "x": 549,
+        "y": 1633,
+        "wires": [
+            [
+                "358ad3b0.3c764c"
+            ]
+        ]
+    },
+    {
+        "id": "cedf983a.f86da8",
+        "type": "ui_dropdown",
+        "z": "2d3756de.a1160a",
+        "name": "Time filter",
+        "label": "",
+        "group": "903670bb.151f8",
+        "order": 4,
+        "width": "4",
+        "height": "1",
+        "passthru": true,
+        "options": [
+            {
+                "label": "Last 24 hrs",
+                "value": 0,
+                "type": "num"
+            },
+            {
+                "label": "Last 7 days",
+                "value": 1,
+                "type": "num"
+            },
+            {
+                "label": "Last 30 days",
+                "value": 2,
+                "type": "num"
+            },
+            {
+                "label": "All",
+                "value": 3,
+                "type": "num"
+            }
+        ],
+        "payload": "",
+        "topic": "msg_time",
+        "x": 551,
+        "y": 1680,
+        "wires": [
+            [
+                "358ad3b0.3c764c"
+            ]
+        ]
+    },
+    {
+        "id": "4e36b05e.8bf3",
+        "type": "inject",
+        "z": "2d3756de.a1160a",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "x": 127,
+        "y": 1625,
+        "wires": [
+            [
+                "f657cc58.19591",
+                "e8aedc9b.0efaf",
+                "842b57e6.327a08"
+            ]
+        ]
+    },
+    {
+        "id": "f657cc58.19591",
+        "type": "change",
+        "z": "2d3756de.a1160a",
+        "name": "Initial value",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "*",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 357,
+        "y": 1633,
+        "wires": [
+            [
+                "f3203af9.e03fb8",
+                "779c47bd.f70d48"
+            ]
+        ]
+    },
+    {
+        "id": "e8aedc9b.0efaf",
+        "type": "change",
+        "z": "2d3756de.a1160a",
+        "name": "Initial value",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "0",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 358,
+        "y": 1679,
+        "wires": [
+            [
+                "cedf983a.f86da8"
+            ]
+        ]
+    },
+    {
+        "id": "6492bee6.94dd8",
+        "type": "ui_toast",
+        "z": "2d3756de.a1160a",
+        "position": "top right",
+        "displayTime": "3",
+        "outputs": 0,
+        "ok": "OK",
+        "cancel": "",
+        "topic": "",
+        "name": "",
+        "x": 355.5,
+        "y": 1181,
+        "wires": []
+    },
+    {
+        "id": "df6606d8.fcd9f8",
+        "type": "ui_dropdown",
+        "z": "2d3756de.a1160a",
+        "name": "New State",
+        "label": "",
+        "group": "903670bb.151f8",
+        "order": 5,
+        "width": "4",
+        "height": "1",
+        "passthru": true,
+        "options": [
+            {
+                "label": "All messages",
+                "value": 0,
+                "type": "num"
+            },
+            {
+                "label": "Only new status",
+                "value": 1,
+                "type": "num"
+            }
+        ],
+        "payload": "",
+        "topic": "msg_newstate",
+        "x": 561,
+        "y": 1726,
+        "wires": [
+            [
+                "358ad3b0.3c764c"
+            ]
+        ]
+    },
+    {
+        "id": "842b57e6.327a08",
+        "type": "change",
+        "z": "2d3756de.a1160a",
+        "name": "Initial value",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "0",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 362,
+        "y": 1728,
+        "wires": [
+            [
+                "df6606d8.fcd9f8"
+            ]
+        ]
+    },
+    {
+        "id": "5e16fc77.48c854",
+        "type": "link out",
+        "z": "2d3756de.a1160a",
+        "name": "System List Updated",
+        "links": [
+            "7cfcfa2d.5af8f4"
+        ],
+        "x": 905,
+        "y": 645,
+        "wires": []
+    },
+    {
+        "id": "c742b421.e2ef88",
+        "type": "ui_dropdown",
+        "z": "2d3756de.a1160a",
+        "name": "System",
+        "label": "",
+        "group": "903670bb.151f8",
+        "order": 6,
+        "width": "5",
+        "height": "1",
+        "passthru": true,
+        "options": [
+            {
+                "label": "",
+                "value": "",
+                "type": "str"
+            }
+        ],
+        "payload": "",
+        "topic": "msg_system",
+        "x": 548,
+        "y": 1536,
+        "wires": [
+            [
+                "358ad3b0.3c764c"
+            ]
+        ]
+    },
+    {
+        "id": "7cfcfa2d.5af8f4",
+        "type": "link in",
+        "z": "2d3756de.a1160a",
+        "name": "",
+        "links": [
+            "5e16fc77.48c854"
+        ],
+        "x": 197,
+        "y": 1537,
+        "wires": [
+            [
+                "52a7c4be.e2edfc"
+            ]
+        ]
+    },
+    {
+        "id": "52a7c4be.e2edfc",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "Process systems",
+        "func": "var output = [];\noutput.push({\"All systems\":\"*\"});\nfor (var i = 0; i < msg.payload.length; i++) {\n    obj = {};\n    obj [\"[\"+msg.payload[i].sys_id+\"] \"+msg.payload[i].sys_name]=msg.payload[i].sys_id;\n    output.push(obj);\n}\nmsg.options = output;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 357,
+        "y": 1536,
+        "wires": [
+            [
+                "c742b421.e2ef88"
+            ]
+        ]
+    },
+    {
+        "id": "779c47bd.f70d48",
+        "type": "delay",
+        "z": "2d3756de.a1160a",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 354.5,
+        "y": 1586,
+        "wires": [
+            [
+                "c742b421.e2ef88"
+            ]
+        ]
+    },
+    {
+        "id": "5d202278.0b4c0c",
+        "type": "comment",
+        "z": "2d3756de.a1160a",
+        "name": "Message Archiving",
+        "info": "",
+        "x": 145,
+        "y": 1949,
+        "wires": []
+    },
+    {
+        "id": "5b6e7f78.a4d53",
+        "type": "inject",
+        "z": "2d3756de.a1160a",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 139,
+        "y": 2006,
+        "wires": [
+            [
+                "89f1b625.782788"
+            ]
+        ]
+    },
+    {
+        "id": "88bcad1a.b263c",
+        "type": "link in",
+        "z": "2d3756de.a1160a",
+        "name": "Diag email notification in",
+        "links": [
+            "3bdde187.1895fe",
+            "ea743b08.ff5758"
+        ],
+        "x": 710.6666666666666,
+        "y": 1199.111111111111,
+        "wires": [
+            [
+                "a2838796.85a9e8"
+            ]
+        ]
+    },
+    {
+        "id": "e7a4f0b6.a580b",
+        "type": "comment",
+        "z": "2d3756de.a1160a",
+        "name": "Diagnostic Daily Digest",
+        "info": "",
+        "x": 139.3333282470703,
+        "y": 2101.777587890625,
+        "wires": []
+    },
+    {
+        "id": "9c172a2a.249778",
+        "type": "sqlite",
+        "z": "2d3756de.a1160a",
+        "mydb": "ea1b8886.6582e8",
+        "name": "Diag DB",
+        "x": 502,
+        "y": 2006,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "89f1b625.782788",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "SQL",
+        "func": "var d = new Date();\nvar epoch = d.getTime();\n\n// today - 30 days\nvar fromdate = epoch - 1000*60*60*24*30;\n\nmsg.topic = \"DELETE * FROM message WHERE msg_epoch < \"+fromdate;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 306,
+        "y": 2006,
+        "wires": [
+            [
+                "9c172a2a.249778"
+            ]
+        ]
+    },
+    {
+        "id": "3ab11b62.15b564",
+        "type": "template",
+        "z": "2d3756de.a1160a",
+        "name": "Formatting",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<table>\n    <tr><th>System</th><th>Status</th></tr>\n    {{#payload}}\n        <tr>\n            <td>{{sys_name}}</td>\n            <td style=\"background-color: {{sta_color}};\">{{sta_title}}</td>\n        </tr>\n    {{/payload}}\n</table>\n",
+        "x": 746.8888549804688,
+        "y": 2161.888345718384,
+        "wires": [
+            [
+                "96c542ca.fcdc8"
+            ]
+        ]
+    },
+    {
+        "id": "c1d4f5e6.546e38",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "System State Summary",
+        "func": "msg.topic = \"SELECT * FROM system, state WHERE sys_state = sta_id ORDER BY sys_id\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 368.77777099609375,
+        "y": 2162.888589859009,
+        "wires": [
+            [
+                "a29be5be.ad3bb8"
+            ]
+        ]
+    },
+    {
+        "id": "a29be5be.ad3bb8",
+        "type": "sqlite",
+        "z": "2d3756de.a1160a",
+        "mydb": "ea1b8886.6582e8",
+        "name": "Diag DB",
+        "x": 560.7777709960938,
+        "y": 2161.888589859009,
+        "wires": [
+            [
+                "3ab11b62.15b564",
+                "77d2c89.6e2ac38"
+            ]
+        ]
+    },
+    {
+        "id": "6931e123.1dbfa",
+        "type": "inject",
+        "z": "2d3756de.a1160a",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "00 06 * * *",
+        "once": false,
+        "x": 140.44444274902344,
+        "y": 2162.888589859009,
+        "wires": [
+            [
+                "c1d4f5e6.546e38",
+                "dd9b617b.d8f3",
+                "cf89d682.5afb28",
+                "f8bc2842.9db688",
+                "b30df625.418ef8",
+                "ade0f760.4c4428",
+                "89838131.52a88"
+            ]
+        ]
+    },
+    {
+        "id": "96f0b7a4.5e0c78",
+        "type": "join",
+        "z": "2d3756de.a1160a",
+        "name": "",
+        "mode": "custom",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "<br/>",
+        "timeout": "5",
+        "count": "8",
+        "x": 1288.222183227539,
+        "y": 2155.5280361175537,
+        "wires": [
+            [
+                "7a3f03d8.e4c3ec"
+            ]
+        ]
+    },
+    {
+        "id": "38cae61d.a691fa",
+        "type": "template",
+        "z": "2d3756de.a1160a",
+        "name": "Formatting",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<table width=\"100%\">\n    <tr><td class=\"solidline\"><b>Severity</b></td><td class=\"solidline\"><b>Timestamp</b></td><td class=\"solidline\"><b>System</b></td><td class=\"solidline\"><b>Message</b></td></tr>\n    {{#payload}}\n        <tr style=\"border-bottom: 1px dotted #e0e0e0;\">\n            <td class=\"dottedline\">{{msg_severity}}</td>\n            <td class=\"dottedline\">{{msg_timestamp}}</td>\n            <td class=\"dottedline\">{{sys_name}}</td>\n            <td class=\"dottedline\">{{msg_text}}</td>\n        </tr>\n    {{/payload}}\n</table>\n",
+        "x": 735.9999923706055,
+        "y": 2231.7775650024414,
+        "wires": [
+            [
+                "a7761ffe.f9a68"
+            ]
+        ]
+    },
+    {
+        "id": "7f817fbb.2fbb1",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "Messages",
+        "func": "var d = new Date();\nvar epoch = d.getTime();\nvar fromdate = 0;\nfromdate = epoch - 1000*60*60*24;\n\nmsg.topic = \"SELECT * FROM message, system WHERE msg_system = sys_id AND msg_epoch > \"+fromdate;\nmsg.topic = msg.topic+ \" ORDER BY msg_id\";\n\n//msg.complete = true;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 337.5555419921875,
+        "y": 2232.888589859009,
+        "wires": [
+            [
+                "1b231a5c.656ec6"
+            ]
+        ]
+    },
+    {
+        "id": "1b231a5c.656ec6",
+        "type": "sqlite",
+        "z": "2d3756de.a1160a",
+        "mydb": "ea1b8886.6582e8",
+        "name": "Diag DB",
+        "x": 544.3333129882812,
+        "y": 2231.888589859009,
+        "wires": [
+            [
+                "38cae61d.a691fa"
+            ]
+        ]
+    },
+    {
+        "id": "dd9b617b.d8f3",
+        "type": "delay",
+        "z": "2d3756de.a1160a",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "100",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 134.7777862548828,
+        "y": 2232.888833999634,
+        "wires": [
+            [
+                "7f817fbb.2fbb1"
+            ]
+        ]
+    },
+    {
+        "id": "42d404de.2e2ebc",
+        "type": "comment",
+        "z": "2d3756de.a1160a",
+        "name": "System Status Stat Reset",
+        "info": "",
+        "x": 157.13888549804688,
+        "y": 2650.749917984009,
+        "wires": []
+    },
+    {
+        "id": "86d3d91.54a9f28",
+        "type": "inject",
+        "z": "2d3756de.a1160a",
+        "name": "",
+        "topic": "reset",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "x": 158.24999237060547,
+        "y": 2716.305337905884,
+        "wires": [
+            [
+                "3af6746.692e08c"
+            ]
+        ]
+    },
+    {
+        "id": "59f58cb5.fada14",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "Reset log",
+        "func": "global.set(\"Diag_System_Buffer\",msg.payload);\n\nvar d = new Date();\nvar current = d.getTime();\nvar output = [];\n\nif (msg.payload!==undefined) {\n    for (var i = 0; i < msg.payload.length; i++) {\n        output = [];\n        output.push( { state: msg.payload[i].sys_state, epoch: current } );\n        global.set(msg.payload[i].sys_name.replace(\" \",\"_\")+\"_statestat\",output);\n    }\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 650.6944274902344,
+        "y": 2717.194253921509,
+        "wires": [
+            [
+                "8d847893.030d08"
+            ]
+        ]
+    },
+    {
+        "id": "8d847893.030d08",
+        "type": "debug",
+        "z": "2d3756de.a1160a",
+        "name": "",
+        "active": false,
+        "console": "false",
+        "complete": "false",
+        "x": 821.8054809570312,
+        "y": 2717.305582046509,
+        "wires": []
+    },
+    {
+        "id": "60cf0a5f.4befa4",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "Update state stat",
+        "func": "var systembuf = global.get(\"Diag_System_Buffer\");\nvar d = new Date();\nvar current = d.getTime();\nvar sys_name = \"\";\n\n// find the system name\nfor (var i=0; i<systembuf.length; i++) {\n    if (systembuf[i].sys_id===msg.system) {\n        sys_name = systembuf[i].sys_name;\n    }\n}\n\nvar statestat = global.get(sys_name.replace(\" \",\"_\")+\"_statestat\");\nif (statestat===undefined) {\n    statestat = [];\n}\n\nstatestat.push({state: msg.state, epoch: current});\nglobal.set(sys_name.replace(\" \",\"_\")+\"_statestat\",statestat);\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 643,
+        "y": 1042,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "77d2c89.6e2ac38",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "Generate state stat",
+        "func": "var statebuf = global.get(\"Diag_State_Buffer\");\nvar d = new Date();\nvar current = d.getTime();\nvar sys_name = \"\";\nvar html = \"<table width='100%'>\";\n\nfor (var i=0; i<msg.payload.length; i++) {\n    html = html + \"<tr><td nowrap>\" + msg.payload[i].sys_name + \"</td><td width='100%'><table height='100%' width='100%'><tr>\";\n    var statestat = global.get(msg.payload[i].sys_name.replace(\" \",\"_\")+\"_statestat\");\n    var width = 0;\n    for (var j=0; j<statestat.length; j++) {\n        if (j===statestat.length-1) {\n            // this is the last item in the list\n            width=Math.floor((current-statestat[j].epoch)/(current-statestat[0].epoch)*100+0.999999999);\n        } else {\n            // this is not the last item in the list\n            width=Math.floor((statestat[j+1].epoch-statestat[j].epoch)/(current-statestat[0].epoch)*100+0.999999999);\n        }\n        \n        // find the color for the state\n        var mycolor = \"\";\n        for (var k=0; k<statebuf.length; k++) {\n            if (statebuf[k].sta_id===statestat[j].state) {\n                mycolor = statebuf[k].sta_color;\n            }\n        }\n        \n        html = html + \"<td style='background-color:\" + mycolor + \"; width:\" + width + \"%'>&nbsp;</td>\";\n    }\n    html = html + \"</tr></table></td></tr>\\n\";\n}\nhtml = html + \"</table>\\n\";\n\nmsg.payload = html;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 512,
+        "y": 2298.999917984009,
+        "wires": [
+            [
+                "33b29a5b.1ecf46",
+                "3af6746.692e08c"
+            ]
+        ]
+    },
+    {
+        "id": "3af6746.692e08c",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "SQL",
+        "func": "msg.topic = \"SELECT * FROM system ORDER BY sys_id\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 339.25,
+        "y": 2716.749917984009,
+        "wires": [
+            [
+                "245d5bdb.f31c44"
+            ]
+        ]
+    },
+    {
+        "id": "245d5bdb.f31c44",
+        "type": "sqlite",
+        "z": "2d3756de.a1160a",
+        "mydb": "ea1b8886.6582e8",
+        "name": "Diag DB",
+        "x": 492.25,
+        "y": 2716.749917984009,
+        "wires": [
+            [
+                "59f58cb5.fada14"
+            ]
+        ]
+    },
+    {
+        "id": "a4a1450f.529bf8",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "Dump state stat",
+        "func": "var systembuf = global.get(\"Diag_System_Buffer\");\nvar d = new Date();\nvar current = d.getTime();\nvar sys_name = \"\";\nvar output = [];\nvar statestat = [];\n\n// find the system name\nfor (var i=0; i<systembuf.length; i++) {\n    sys_name = systembuf[i].sys_name;\n    //var statestat = \"none\";\n    statestat = global.get(sys_name.replace(\" \",\"_\")+\"_statestat\");\n    if (statestat===undefined) {\n        statestat=[];\n    }\n    output.push({system: sys_name, stat: statestat});\n}\n\nmsg.payload = output;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 374.2500305175781,
+        "y": 2845.035888671875,
+        "wires": [
+            [
+                "9b5ab040.3f5ea"
+            ]
+        ]
+    },
+    {
+        "id": "9b5ab040.3f5ea",
+        "type": "debug",
+        "z": "2d3756de.a1160a",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "false",
+        "x": 634.1071510314941,
+        "y": 2846.4644412994385,
+        "wires": []
+    },
+    {
+        "id": "fe8cf1ee.c4e41",
+        "type": "inject",
+        "z": "2d3756de.a1160a",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 154.1071510314942,
+        "y": 2843.6072984422954,
+        "wires": [
+            [
+                "a4a1450f.529bf8"
+            ]
+        ]
+    },
+    {
+        "id": "a20e1f80.b523e",
+        "type": "comment",
+        "z": "2d3756de.a1160a",
+        "name": "Debugging",
+        "info": "",
+        "x": 89.82142639160156,
+        "y": 2792.1787109375,
+        "wires": []
+    },
+    {
+        "id": "7a3f03d8.e4c3ec",
+        "type": "template",
+        "z": "2d3756de.a1160a",
+        "name": "Email body",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<html>\n    <body style=\"margin:0; padding:0;\" bgcolor=\"#f2f2f2\" leftmargin=\"0\" t=\nopmargin=\"0\" marginwidth=\"0\" marginheight=\"0\">\n<style>\n   body {\n    margin: 0;\n    padding: 0;\n    -ms-text-size-adjust: 100%;\n    -webkit-text-size-adjust: 100%;\n    font-family: 'Roboto', Helvetica, Arial, sans-serif;\n  }\n\n  table {\n    border-spacing: 0;\n  }\n\n  table td {\n    border-collapse: collapse;\n  }\n\n  .ReadMsgBody {\n    width: 100%;\n    background-color: #ebebeb;\n  }\n  \n  .divider {\n    border-bottom: 1px solid #e2066e;\n  }\n  \n  td.solidline {\n      border-bottom: 1px solid #e0e0e0;\n  }\n  \n  td.dottedline {\n      border-bottom: 1px dotted #e0e0e0;\n  }  \n\n</style>        \n\n<table border=\"0\" width=\"100%\" height=\"100%\" cellpadding=\"0\" cellsp=\nacing=\"0\" bgcolor=\"#ffffff\" style=\"border: 20px solid #f2f2f2;\">\n  <tr><td valign=\"top\" width=\"20\"></td><td valign=\"top\">\n        \n        <p style=\"text-align: right;\"><span style=\"font-size:150%;\">{{{payload.title}}}</span><br/>\n        <span style=\"font-size:80%;\">{{{payload.date}}}</span></p>\n        <table bgcolor=\"#f3f3f3\" cellspacing=\"4\" align=\"center\"><tr><td bgcolor=\"#ffffff\" width=\"120\">{{{payload.solar1}}}</td><td bgcolor=\"#ffffff\" width=\"120\">{{{payload.solar2}}}</td><td bgcolor=\"#ffffff\" width=\"120\">{{{payload.solar3}}}</td></tr></table>\n  </td><td valign=\"top\" width=\"20\"></td></tr>\n  <tr><td style=\"border-bottom: 1px solid #e2066e;\" colspan=\"3\"></td></tr>\n  <tr><td valign=\"top\" width=\"20\"></td><td valign=\"top\">\n        {{{payload.state_summary}}}\n  </td><td valign=\"top\" width=\"20\"></td></tr>\n  <tr><td style=\"border-bottom: 1px solid #e2066e;\" colspan=\"3\"></td></tr>\n  <tr><td valign=\"top\" width=\"20\"></td><td valign=\"top\">\n        {{{payload.state_stat}}}\n  </td><td valign=\"top\" width=\"20\"></td></tr>\n  <tr><td style=\"border-bottom: 1px solid #e2066e;\" colspan=\"3\"></td></tr>\n  <tr><td valign=\"top\" width=\"20\"></td><td valign=\"top\">\n        {{{payload.messages}}}\n  </td><td valign=\"top\" width=\"20\"></td></tr>\n \n</table>\n    </body>\n</html>",
+        "x": 1461.000057220459,
+        "y": 2155.527823448181,
+        "wires": [
+            [
+                "cdc921eb.6f5f5"
+            ]
+        ]
+    },
+    {
+        "id": "cdc921eb.6f5f5",
+        "type": "change",
+        "z": "2d3756de.a1160a",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "Daily Diagnostic Report",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1653.222324371338,
+        "y": 2155.5279865264893,
+        "wires": [
+            [
+                "ea743b08.ff5758"
+            ]
+        ]
+    },
+    {
+        "id": "ea743b08.ff5758",
+        "type": "link out",
+        "z": "2d3756de.a1160a",
+        "name": "",
+        "links": [
+            "88bcad1a.b263c"
+        ],
+        "x": 1785.4446334838867,
+        "y": 2155.528067588806,
+        "wires": []
+    },
+    {
+        "id": "96c542ca.fcdc8",
+        "type": "change",
+        "z": "2d3756de.a1160a",
+        "name": "Set topic",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "state_summary",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 918.2222290039062,
+        "y": 2163.2220611572266,
+        "wires": [
+            [
+                "96f0b7a4.5e0c78"
+            ]
+        ]
+    },
+    {
+        "id": "a7761ffe.f9a68",
+        "type": "change",
+        "z": "2d3756de.a1160a",
+        "name": "Set topic",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "messages",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 904.4444732666016,
+        "y": 2231.4444522857666,
+        "wires": [
+            [
+                "96f0b7a4.5e0c78"
+            ]
+        ]
+    },
+    {
+        "id": "33b29a5b.1ecf46",
+        "type": "change",
+        "z": "2d3756de.a1160a",
+        "name": "Set topic",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "state_stat",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 902.6666259765625,
+        "y": 2296.222085952759,
+        "wires": [
+            [
+                "96f0b7a4.5e0c78"
+            ]
+        ]
+    },
+    {
+        "id": "cf89d682.5afb28",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "Run date",
+        "func": "// Update the status with current timestamp\nvar now = new Date();\nvar yyyy = now.getFullYear();\nvar mm = now.getMonth() < 9 ? \"0\" + (now.getMonth() + 1) : (now.getMonth() + 1); // getMonth() is zero-based\nvar dd  = now.getDate() < 10 ? \"0\" + now.getDate() : now.getDate();\nvar hh = now.getHours() < 10 ? \"0\" + now.getHours() : now.getHours();\nvar mmm  = now.getMinutes() < 10 ? \"0\" + now.getMinutes() : now.getMinutes();\nvar ss  = now.getSeconds() < 10 ? \"0\" + now.getSeconds() : now.getSeconds();\nmsg.payload = dd + \".\" + mm + \".\" + yyyy + \".\";    \n      \nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 336,
+        "y": 2356.499917984009,
+        "wires": [
+            [
+                "4249b5ae.b8a8ac"
+            ]
+        ]
+    },
+    {
+        "id": "4249b5ae.b8a8ac",
+        "type": "change",
+        "z": "2d3756de.a1160a",
+        "name": "Set topic",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "date",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 903.5,
+        "y": 2355.249917984009,
+        "wires": [
+            [
+                "96f0b7a4.5e0c78"
+            ]
+        ]
+    },
+    {
+        "id": "1b1b4bb9.d44b84",
+        "type": "change",
+        "z": "2d3756de.a1160a",
+        "name": "Set topic",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "title",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 904.75,
+        "y": 2405.249917984009,
+        "wires": [
+            [
+                "96f0b7a4.5e0c78"
+            ]
+        ]
+    },
+    {
+        "id": "f8bc2842.9db688",
+        "type": "change",
+        "z": "2d3756de.a1160a",
+        "name": "Report title",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "Node Red Diagnistic Daily Report",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 344.75,
+        "y": 2403.999917984009,
+        "wires": [
+            [
+                "1b1b4bb9.d44b84"
+            ]
+        ]
+    },
+    {
+        "id": "b30df625.418ef8",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "SQL",
+        "func": "var p_30d  = 1000*60*60*24*30 ; //30 Days\nvar p_7d  = 1000*60*60*24*7 ; //7 Days\nvar p_1d   =  1000*60*60*24 ; // 1 Day\nvar d = new Date();\nvar current = d.getTime();\nvar today0h = d.setHours(0,0,0,0);\nvar day = d.getDay();\nvar monday0h = today0h - (day + (day === 0 ? -6:1)) * p_1d;\nvar fromdate = 0;\nvar enddate = 0;\nvar sql = [];\n\nfromdate = today0h - p_30d;\nenddate = today0h;\nsql.push({ topic: \"SELECT sum(value) AS value FROM sensor_aggr WHERE device='growatt' AND sensor='today' AND epoch >= \" + fromdate + \" AND epoch <= \" + enddate });\n\nfromdate = fromdate - p_30d;\nenddate = enddate - p_30d;\nsql.push({ topic: \"SELECT sum(value) AS value FROM sensor_aggr WHERE device='growatt' AND sensor='today' AND epoch >= \" + fromdate + \" AND epoch <= \" + enddate });\n\n// set the completed flag for the join node later\nsql[sql.length-1].complete=true;\n\nreturn [ sql ];",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 326.50000381469727,
+        "y": 2457.4999647140503,
+        "wires": [
+            [
+                "810e887.3308078"
+            ]
+        ]
+    },
+    {
+        "id": "810e887.3308078",
+        "type": "sqlite",
+        "z": "2d3756de.a1160a",
+        "mydb": "2958e924.921a76",
+        "name": "DB",
+        "x": 471.50000381469727,
+        "y": 2456.4999647140503,
+        "wires": [
+            [
+                "c3a26322.5baed"
+            ]
+        ]
+    },
+    {
+        "id": "c3a26322.5baed",
+        "type": "join",
+        "z": "2d3756de.a1160a",
+        "name": "",
+        "mode": "custom",
+        "build": "array",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "timeout": "",
+        "count": "",
+        "x": 604.5000038146973,
+        "y": 2456.4999647140503,
+        "wires": [
+            [
+                "9ca3e83c.5e4c18"
+            ]
+        ]
+    },
+    {
+        "id": "9ca3e83c.5e4c18",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "Prep Data",
+        "func": "// Output format for the ui_template node\n// msg.current: current values displayed in large numbers\n// msg.unit: unit value shown under the current value\n// msg.trend = up|down: displays the up/down trend arrow\n// msg.reference: reference/past value displayed in smaller numbers\n// msg.title: KPI title shown on the top\n\nmsg.title = \"Solar generation in last 30 days\";\nmsg.current = Math.floor(msg.payload[0][0].value/1000);\nmsg.unit = \"kWh\";\nmsg.reference = Math.floor(msg.payload[1][0].value/1000);\nif (msg.payload[0][0].value>msg.payload[1][0].value) {\n    msg.trend = \"&#8679;\";\n    msg.trendcolor = \"green\";\n} else {\n    msg.trend = \"&#8681;\";\n    msg.trendcolor = \"red\";\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 766.5000038146973,
+        "y": 2456.4999647140503,
+        "wires": [
+            [
+                "1cbbc7f6.0ed6f8"
+            ]
+        ]
+    },
+    {
+        "id": "ade0f760.4c4428",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "SQL",
+        "func": "var p_30d  = 1000*60*60*24*30 ; //30 Days\nvar p_7d  = 1000*60*60*24*7 ; //7 Days\nvar p_1d   =  1000*60*60*24 ; // 1 Day\nvar d = new Date();\nvar current = d.getTime();\nvar today0h = d.setHours(0,0,0,0);\nvar day = d.getDay();\nvar monday0h = today0h - (day + (day === 0 ? -6:1)) * p_1d;\nvar fromdate = 0;\nvar enddate = 0;\nvar sql = [];\n\nfromdate = today0h - p_7d;\nenddate = today0h;\nsql.push({ topic: \"SELECT sum(value) AS value FROM sensor_aggr WHERE device='growatt' AND sensor='today' AND epoch >= \" + fromdate + \" AND epoch <= \" + enddate });\n\nfromdate = fromdate - p_7d;\nenddate = enddate - p_7d;\nsql.push({ topic: \"SELECT sum(value) AS value FROM sensor_aggr WHERE device='growatt' AND sensor='today' AND epoch >= \" + fromdate + \" AND epoch <= \" + enddate });\n\n// set the completed flag for the join node later\nsql[sql.length-1].complete=true;\n\nreturn [ sql ];",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 324.50000381469727,
+        "y": 2509.4999647140503,
+        "wires": [
+            [
+                "10bd47fb.208958"
+            ]
+        ]
+    },
+    {
+        "id": "10bd47fb.208958",
+        "type": "sqlite",
+        "z": "2d3756de.a1160a",
+        "mydb": "2958e924.921a76",
+        "name": "DB",
+        "x": 469.50000381469727,
+        "y": 2508.4999647140503,
+        "wires": [
+            [
+                "23cbec0.fdb4c14"
+            ]
+        ]
+    },
+    {
+        "id": "23cbec0.fdb4c14",
+        "type": "join",
+        "z": "2d3756de.a1160a",
+        "name": "",
+        "mode": "custom",
+        "build": "array",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "timeout": "",
+        "count": "",
+        "x": 602.5000038146973,
+        "y": 2508.4999647140503,
+        "wires": [
+            [
+                "d71aa82c.07b778"
+            ]
+        ]
+    },
+    {
+        "id": "d71aa82c.07b778",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "Prep Data",
+        "func": "// Output format for the ui_template node\n// msg.current: current values displayed in large numbers\n// msg.unit: unit value shown under the current value\n// msg.trend = up|down: displays the up/down trend arrow\n// msg.reference: reference/past value displayed in smaller numbers\n// msg.title: KPI title shown on the top\n\nmsg.title = \"Solar generation in last 7 days\";\nmsg.current = parseFloat(msg.payload[0][0].value/1000).toFixed(1);\nmsg.unit = \"kWh\";\nmsg.reference = Math.abs(Math.floor((msg.payload[0][0].value-msg.payload[1][0].value)/msg.payload[0][0].value*100)) + \"%\";\nif (msg.payload[0][0].value>msg.payload[1][0].value) {\n    msg.trend = \"&#8679;\";\n    msg.trendcolor = \"green\";\n} else {\n    msg.trend = \"&#8681;\";\n    msg.trendcolor = \"red\";\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 764.5000038146973,
+        "y": 2508.4999647140503,
+        "wires": [
+            [
+                "1e4a22cc.dd873d"
+            ]
+        ]
+    },
+    {
+        "id": "89838131.52a88",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "SQL",
+        "func": "var p_30d  = 1000*60*60*24*30 ; //30 Days\nvar p_7d  = 1000*60*60*24*7 ; //7 Days\nvar p_1d   =  1000*60*60*24 ; // 1 Day\nvar d = new Date();\nvar current = d.getTime();\nvar today0h = d.setHours(0,0,0,0);\nvar day = d.getDay();\nvar monday0h = today0h - (day + (day === 0 ? -6:1)) * p_1d;\nvar fromdate = 0;\nvar enddate = 0;\nvar sql = [];\n\nfromdate = today0h-p_1d;\nmsg.topic= \"SELECT * FROM sensor_aggr WHERE device='growatt' AND sensor='today' AND epoch = \" + fromdate + \";\";\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 329.50000381469727,
+        "y": 2564.4999647140503,
+        "wires": [
+            [
+                "6db4588e.4584b8"
+            ]
+        ]
+    },
+    {
+        "id": "6db4588e.4584b8",
+        "type": "sqlite",
+        "z": "2d3756de.a1160a",
+        "mydb": "2958e924.921a76",
+        "name": "DB",
+        "x": 474.50000381469727,
+        "y": 2563.4999647140503,
+        "wires": [
+            [
+                "8a278f66.ba663"
+            ]
+        ]
+    },
+    {
+        "id": "8a278f66.ba663",
+        "type": "function",
+        "z": "2d3756de.a1160a",
+        "name": "Prep Data",
+        "func": "// Output format for the ui_template node\n// msg.current: current values displayed in large numbers\n// msg.unit: unit value shown under the current value\n// msg.trend = up|down: displays the up/down trend arrow\n// msg.reference: reference/past value displayed in smaller numbers\n// msg.title: KPI title shown on the top\n\nmsg.title = \"Solar generation yesterday vs. max\";\nmsg.current = parseFloat(msg.payload[0].value/1000).toFixed(2);\nmsg.unit = \"kWh\";\nvar width = Math.abs(Math.floor(msg.payload[0].value/20000*100));\nmsg.reference = width.toString() + \"%\";\nmsg.reference2 = (100-width).toString() + \"%\";\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 634.5000038146973,
+        "y": 2563.4999647140503,
+        "wires": [
+            [
+                "e1c753c5.2cbf3"
+            ]
+        ]
+    },
+    {
+        "id": "1cbbc7f6.0ed6f8",
+        "type": "template",
+        "z": "2d3756de.a1160a",
+        "name": "Formatting",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "\n    <table width=\"100%\" height=\"100%\">\n        <tr>\n            <td colspan=\"2\">{{title}}</td>\n        </tr>\n        <tr>\n            <td rowspan=\"2\" style=\"text-align: center;\"><span style=\"font-size: 300%; font-weight: bold;\">{{current}}</span><br/>{{unit}}</td>\n            <td style=\"text-align: center; font-size: 300%; font-weight: bold; color:{{trendcolor}}; background-color:white;\">{{{trend}}}</td>\n        </tr>\n        <tr>\n            <td style=\"text-align: center; font-style: italic;\">{{reference}}</td>\n        </tr>\n    </table>\n",
+        "x": 938.5000152587891,
+        "y": 2456.4999656677246,
+        "wires": [
+            [
+                "51541c74.949c44"
+            ]
+        ]
+    },
+    {
+        "id": "1e4a22cc.dd873d",
+        "type": "template",
+        "z": "2d3756de.a1160a",
+        "name": "Formatting",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "\n    <table width=\"100%\" height=\"100%\">\n        <tr>\n            <td colspan=\"2\">{{title}}</td>\n        </tr>\n        <tr>\n            <td rowspan=\"2\" style=\"text-align: center;\"><span style=\"font-size: 300%; font-weight: bold;\">{{current}}</span><br/>{{unit}}</td>\n            <td style=\"text-align: center; font-size: 300%; font-weight: bold; color:{{trendcolor}}; background-color:white;\">{{{trend}}}</td>\n        </tr>\n        <tr>\n            <td style=\"text-align: center; font-style: italic;\">{{reference}}</td>\n        </tr>\n    </table>\n",
+        "x": 936.0000152587891,
+        "y": 2508.9999656677246,
+        "wires": [
+            [
+                "a154bb5f.463d08"
+            ]
+        ]
+    },
+    {
+        "id": "e1c753c5.2cbf3",
+        "type": "template",
+        "z": "2d3756de.a1160a",
+        "name": "Formatting",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "\n    <table width=\"100%\" height=\"100%\" style=\"border-collapse: collapse;\">\n        <tr>\n            <td colspan=\"2\">{{title}}</td>\n        </tr>\n        <tr>\n            <td rowspan=\"2\" style=\"text-align: center;\"><span style=\"font-size: 300%; font-weight: bold;\">{{current}}</span><br/>{{unit}}</td>\n            <td style=\"text-align: center; font-size: 300%; font-weight: bold; color:{{trendcolor}}; background-color:white;\">&nbsp;</td>\n        </tr>\n        <tr>\n            <td style=\"text-align: center; font-style: italic;\">{{reference}}</td>\n        </tr>\n        <tr style=\"background-color: lightgrey;\"><td colspan=\"2\">\n            <table width=\"100%\" height=\"100%\" style=\"border-collapse: collapse;\"><tr>\n            <td width={{reference}} style=\"border-bottom: 6px solid blue;\"></td><td width={{reference2}}></td>\n            </tr></table></td>\n        </tr>\n    </table>\n",
+        "x": 807.2500152587891,
+        "y": 2562.7499656677246,
+        "wires": [
+            [
+                "a1aab0e0.7dae3"
+            ]
+        ]
+    },
+    {
+        "id": "51541c74.949c44",
+        "type": "change",
+        "z": "2d3756de.a1160a",
+        "name": "Set topic",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "solar1",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1104.75,
+        "y": 2457.749917984009,
+        "wires": [
+            [
+                "96f0b7a4.5e0c78"
+            ]
+        ]
+    },
+    {
+        "id": "a154bb5f.463d08",
+        "type": "change",
+        "z": "2d3756de.a1160a",
+        "name": "Set topic",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "solar2",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1102.25,
+        "y": 2511.499917984009,
+        "wires": [
+            [
+                "96f0b7a4.5e0c78"
+            ]
+        ]
+    },
+    {
+        "id": "a1aab0e0.7dae3",
+        "type": "change",
+        "z": "2d3756de.a1160a",
+        "name": "Set topic",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "solar3",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1103.500015258789,
+        "y": 2562.7499656677246,
+        "wires": [
+            [
+                "96f0b7a4.5e0c78"
+            ]
+        ]
+    },
+    {
+        "id": "ea1b8886.6582e8",
+        "type": "sqlitedb",
+        "z": "",
+        "db": "/home/pi/sqlite/diagnostic"
+    },
+    {
+        "id": "8aa00ad4.466278",
+        "type": "ui_group",
+        "z": "",
+        "name": "State Administration",
+        "tab": "e5a63a9f.8da488",
+        "disp": true,
+        "width": "6"
+    },
+    {
+        "id": "c12f5635.0918d8",
+        "type": "ui_group",
+        "z": "",
+        "name": "System Administration",
+        "tab": "e5a63a9f.8da488",
+        "order": 3,
+        "disp": true,
+        "width": "6"
+    },
+    {
+        "id": "f546b57b.ffc4c8",
+        "type": "ui_group",
+        "z": "",
+        "name": "System Status",
+        "tab": "e5a63a9f.8da488",
+        "disp": true,
+        "width": "6"
+    },
+    {
+        "id": "903670bb.151f8",
+        "type": "ui_group",
+        "z": "",
+        "name": "System Messages",
+        "tab": "e5a63a9f.8da488",
+        "disp": true,
+        "width": "24"
+    },
+    {
+        "id": "2958e924.921a76",
+        "type": "sqlitedb",
+        "z": "",
+        "db": "/home/pi/sqlite/nodered"
+    },
+    {
+        "id": "e5a63a9f.8da488",
+        "type": "ui_tab",
+        "z": "",
+        "name": "Logs",
+        "icon": "message",
+        "order": 3
+    }
+]
