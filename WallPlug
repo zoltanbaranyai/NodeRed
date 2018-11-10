@@ -1,0 +1,323 @@
+[
+    {
+        "id": "ab8a43d9.4bad4",
+        "type": "mqtt out",
+        "z": "6298d11d.e5c9e",
+        "name": "",
+        "topic": "/Node200/gpio/12",
+        "qos": "0",
+        "retain": "",
+        "broker": "cb7ebda1.05ae7",
+        "x": 890,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "7324712a.55e63",
+        "type": "ui_switch",
+        "z": "6298d11d.e5c9e",
+        "name": "Media Centre",
+        "label": "Media Centre",
+        "group": "71c7e53e.59363c",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "decouple": "false",
+        "topic": "",
+        "style": "",
+        "onvalue": "1",
+        "onvalueType": "str",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "0",
+        "offvalueType": "str",
+        "officon": "",
+        "offcolor": "",
+        "x": 660,
+        "y": 280,
+        "wires": [
+            [
+                "ab8a43d9.4bad4"
+            ]
+        ]
+    },
+    {
+        "id": "7993a067.53c41",
+        "type": "mqtt in",
+        "z": "6298d11d.e5c9e",
+        "name": "",
+        "topic": "/Node200/#",
+        "qos": "0",
+        "broker": "cb7ebda1.05ae7",
+        "x": 310,
+        "y": 520,
+        "wires": [
+            [
+                "33cb935d.fd22cc"
+            ]
+        ]
+    },
+    {
+        "id": "33cb935d.fd22cc",
+        "type": "debug",
+        "z": "6298d11d.e5c9e",
+        "name": "",
+        "active": false,
+        "console": "false",
+        "complete": "false",
+        "x": 594,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "1dec12cc.8a119d",
+        "type": "mqtt in",
+        "z": "6298d11d.e5c9e",
+        "name": "",
+        "topic": "/Node200/Relay/Status",
+        "qos": "0",
+        "broker": "cb7ebda1.05ae7",
+        "x": 380,
+        "y": 240,
+        "wires": [
+            [
+                "7324712a.55e63"
+            ]
+        ]
+    },
+    {
+        "id": "33b582ae.05fe2e",
+        "type": "inject",
+        "z": "6298d11d.e5c9e",
+        "name": "",
+        "topic": "",
+        "payload": "1",
+        "payloadType": "str",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 431,
+        "y": 285,
+        "wires": [
+            [
+                "7324712a.55e63"
+            ]
+        ]
+    },
+    {
+        "id": "2f13cee1.25aad2",
+        "type": "inject",
+        "z": "6298d11d.e5c9e",
+        "name": "",
+        "topic": "",
+        "payload": "0",
+        "payloadType": "str",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 430,
+        "y": 325,
+        "wires": [
+            [
+                "7324712a.55e63"
+            ]
+        ]
+    },
+    {
+        "id": "755b0f4f.b725b",
+        "type": "bigtimer",
+        "z": "6298d11d.e5c9e",
+        "outtopic": "/home/test",
+        "outpayload1": "",
+        "outpayload2": "",
+        "name": "Big Timer",
+        "lat": "47.44021",
+        "lon": "19.02919",
+        "starttime": "5001",
+        "endtime": "1380",
+        "startoff": "0",
+        "endoff": "0",
+        "offs": "0",
+        "outtext1": "1",
+        "outtext2": "0",
+        "timeout": "480",
+        "sun": true,
+        "mon": true,
+        "tue": true,
+        "wed": true,
+        "thu": true,
+        "fri": true,
+        "sat": true,
+        "jan": true,
+        "feb": true,
+        "mar": true,
+        "apr": true,
+        "may": true,
+        "jun": true,
+        "jul": true,
+        "aug": true,
+        "sep": true,
+        "oct": true,
+        "nov": true,
+        "dec": true,
+        "day1": "0",
+        "month1": "0",
+        "day2": "0",
+        "month2": "0",
+        "day3": "0",
+        "month3": "0",
+        "day4": "0",
+        "month4": "0",
+        "day5": "0",
+        "month5": "0",
+        "d1": "0",
+        "w1": "0",
+        "d2": "0",
+        "w2": "0",
+        "d3": "0",
+        "w3": "0",
+        "d4": "0",
+        "w4": "0",
+        "d5": "0",
+        "w5": "0",
+        "suspend": false,
+        "random": false,
+        "repeat": false,
+        "atstart": false,
+        "odd": false,
+        "even": false,
+        "x": 420,
+        "y": 381.5,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "302bbbc0.bee514",
+        "type": "comment",
+        "z": "6298d11d.e5c9e",
+        "name": "http://192.168.1.200/control?cmd=event,RelayStatusRead",
+        "info": "",
+        "x": 490,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "904e29b4.8fca68",
+        "type": "http request",
+        "z": "6298d11d.e5c9e",
+        "name": "",
+        "method": "GET",
+        "ret": "txt",
+        "url": "http://192.168.1.200/control?cmd=event,RelayStatusRead",
+        "tls": "",
+        "x": 170,
+        "y": 180,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "256e4bda.2adcd4",
+        "type": "inject",
+        "z": "6298d11d.e5c9e",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "300",
+        "crontab": "",
+        "once": true,
+        "x": 170,
+        "y": 100,
+        "wires": [
+            [
+                "904e29b4.8fca68"
+            ]
+        ]
+    },
+    {
+        "id": "2f2eb48.852a44c",
+        "type": "mqtt in",
+        "z": "6298d11d.e5c9e",
+        "name": "",
+        "topic": "/Node200/IP",
+        "qos": "0",
+        "broker": "cb7ebda1.05ae7",
+        "x": 310,
+        "y": 580,
+        "wires": [
+            [
+                "72e607f1.17dcf8"
+            ]
+        ]
+    },
+    {
+        "id": "72e607f1.17dcf8",
+        "type": "debug",
+        "z": "6298d11d.e5c9e",
+        "name": "",
+        "active": false,
+        "console": "false",
+        "complete": "false",
+        "x": 594,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "d165df79.94c9f",
+        "type": "mqtt in",
+        "z": "6298d11d.e5c9e",
+        "name": "",
+        "topic": "/Node200/RelayStatusRead",
+        "qos": "0",
+        "broker": "cb7ebda1.05ae7",
+        "x": 400,
+        "y": 180,
+        "wires": [
+            [
+                "7324712a.55e63"
+            ]
+        ]
+    },
+    {
+        "id": "cb7ebda1.05ae7",
+        "type": "mqtt-broker",
+        "z": "",
+        "broker": "Localhost",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": true,
+        "keepalive": "60",
+        "cleansession": true,
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": ""
+    },
+    {
+        "id": "71c7e53e.59363c",
+        "type": "ui_group",
+        "z": "",
+        "name": "Switch",
+        "tab": "89889251.7575f",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": true
+    },
+    {
+        "id": "89889251.7575f",
+        "type": "ui_tab",
+        "z": "",
+        "name": "Nappali",
+        "icon": "dashboard",
+        "order": 1
+    }
+]
